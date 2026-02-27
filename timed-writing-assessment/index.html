@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ASD Writing Assessment</title>
+  <title>smith-teaches-tech — Writing Assessment</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 
@@ -252,15 +252,19 @@
       flex-direction: column;
     }
 
-    /* Writing header bar */
+    /* Writing header bar — sticky so timer is always visible */
     .writing-header {
       background: var(--navy-d);
       color: #fff;
       padding: 0 1.5rem;
       flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
     }
     .writing-header-inner {
-      max-width: 900px;
+      max-width: 1200px;
       margin: 0 auto;
       display: flex;
       align-items: center;
@@ -313,7 +317,7 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      max-width: 900px;
+      max-width: 1200px;
       width: 100%;
       margin: 0 auto;
       padding: 1.75rem 1.5rem;
@@ -322,10 +326,10 @@
       flex: 1;
       width: 100%;
       min-height: 560px;
-      padding: 1.5rem 1.75rem;
+      padding: 1.5rem 2rem;
       font-family: 'DM Sans', sans-serif;
       font-size: 1.05rem;
-      line-height: 1.75;
+      line-height: 1.85;
       color: var(--text);
       background: var(--surface);
       border: 1.5px solid var(--border);
@@ -335,11 +339,15 @@
       transition: border-color var(--t);
     }
     #essay-textarea:focus { outline: none; border-color: var(--navy-l); }
-    #essay-textarea:disabled { background: var(--cream-d); cursor: not-allowed; color: var(--muted); }
+    #essay-textarea:disabled {
+      background: var(--cream-d);
+      cursor: not-allowed;
+      color: var(--muted);
+    }
 
     /* Submit bar */
     .writing-footer {
-      max-width: 900px;
+      max-width: 1200px;
       width: 100%;
       margin: 0 auto;
       padding: 0 1.5rem 1.5rem;
@@ -678,7 +686,26 @@
     .log-time { color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.72rem; min-width: 50px; }
     .log-detail { color: var(--text); flex: 1; }
 
-    /* ── Toast ─────────────────────────────────────── */
+    /* ── WATERMARK BAR ───────────────────────────────── */
+    .watermark-bar {
+      background: #00c27a;
+      color: #fff;
+      text-align: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.3rem 1rem;
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    .log-entry.tab_hidden  { background: #fdecea; border-left: 3px solid #c0392b; }
+    .log-entry.window_blur { background: #fdecea; border-left: 3px solid #c0392b; }
+    .log-entry.right_click { background: #fff3e0; border-left: 3px solid #e67e22; }
+    .log-entry.shortcut    { background: #fff3e0; border-left: 3px solid #e67e22; }
+    .log-entry.word_drop   { background: #fdecea; border-left: 3px solid #c0392b; }
     #toast-container {
       position: fixed;
       bottom: 1.5rem;
@@ -785,7 +812,7 @@
   <div class="landing-inner">
     <div class="landing-eyebrow">
       <div class="landing-eyebrow-line"></div>
-      <span>American School of Dhahran · English Department</span>
+      <span>smith-teaches-tech · Writing Assessment</span>
       <div class="landing-eyebrow-line"></div>
     </div>
     <h1 class="landing-title">Writing <em>Assessment</em></h1>
@@ -854,6 +881,7 @@
       </div>
     </div>
   </header>
+  <div class="watermark-bar" id="watermark-bar">● smith-teaches-tech · assessment in progress ●</div>
 
   <div class="writing-main">
     <textarea
@@ -936,7 +964,7 @@
   <header class="dash-header">
     <div class="dash-header-inner">
       <div class="dash-brand">
-        <div class="eyebrow">American School of Dhahran · English Department</div>
+        <div class="eyebrow">smith-teaches-tech · Writing Assessment</div>
         <h1>Writing Assessment Dashboard</h1>
       </div>
       <div style="display:flex;gap:0.6rem;align-items:center">
@@ -1050,9 +1078,12 @@ const STATE = {
   // Process log tracking vars
   lastInputTime: null,
   lastTextLength: 0,
+  lastWordCount: 0,      // for word-drop detection in autosave
   pendingBurstChars: 0,
   burstCheckInterval: null,
-  sessionStartTime: null,   // Date.now() when writing session began (for elapsed calc)
+  sessionStartTime: null,
+  _visibilityHandler: null,  // stored so we can remove on submit
+  _blurHandler: null,        // stored so we can remove on submit
 
   // Teacher session
   selectedAssignmentId: null,   // assignment being viewed in dashboard
@@ -1244,10 +1275,10 @@ function enterWritingMode(savedText) {
     `${STATE.studentName} · ${STATE.period}`;
 
   // Set up textarea
-  const ta = document.getElementById('essay-textarea');
-  ta.value = savedText;
-  ta.disabled = false;
-  STATE.lastTextLength = savedText.length;
+  const editor = document.getElementById('essay-textarea');
+  editor.value = savedText || '';
+  editor.disabled = false;
+  STATE.lastTextLength = (savedText || '').length;
   updateWordCountDisplay();
 
   showScreen('writing');
@@ -1269,10 +1300,29 @@ function enterWritingMode(savedText) {
   STATE.burstCheckInterval = setInterval(checkBurstAndIdle, 3000);
 
   // Attach process event listeners to the textarea
-  attachProcessListeners(ta);
+  attachProcessListeners(editor);
 
-  // Focus the essay area
-  setTimeout(() => ta.focus(), 100);
+  // ── Tab visibility (Page Visibility API) ──
+  STATE._visibilityHandler = () => {
+    if (document.hidden) {
+      logEvent('tab_hidden', { content_preview: 'Student switched tabs or minimized browser' });
+    }
+  };
+  document.addEventListener('visibilitychange', STATE._visibilityHandler);
+
+  // ── Window blur ──
+  STATE._blurHandler = () => {
+    if (!document.hidden) {
+      logEvent('window_blur', { content_preview: 'Student switched to another application' });
+    }
+  };
+  window.addEventListener('blur', STATE._blurHandler);
+
+  // Focus the textarea
+  setTimeout(() => {
+    const ta = document.getElementById('essay-textarea');
+    if (ta) ta.focus();
+  }, 100);
 }
 
 // ═══════════════════════════════════════════════════
@@ -1332,6 +1382,16 @@ async function autosave() {
   const ta = document.getElementById('essay-textarea');
   if (!ta) return;
   const text = ta.value;
+  const currentWordCount = countWords(text);
+
+  // WORD DROP: If essay loses 50+ words between saves, log it
+  if (STATE.lastWordCount > 50 && (STATE.lastWordCount - currentWordCount) >= 50) {
+    logEvent('word_drop', {
+      char_count: STATE.lastWordCount - currentWordCount,
+      content_preview: `Word count dropped from ${STATE.lastWordCount} to ${currentWordCount}`,
+    });
+  }
+  STATE.lastWordCount = currentWordCount;
 
   const indicator = document.getElementById('autosave-indicator');
   if (indicator) { indicator.className = 'autosave-indicator saving'; indicator.textContent = 'Saving…'; }
@@ -1339,7 +1399,7 @@ async function autosave() {
   try {
     await db.from('submissions').update({
       essay_text:    text,
-      word_count:    countWords(text),
+      word_count:    currentWordCount,
       process_log:   STATE.processLog,
       last_saved_at: new Date().toISOString(),
     }).eq('id', STATE.submissionId);
@@ -1373,10 +1433,10 @@ async function manualSave() {
 // PROCESS LOGGING
 // Captures paste, idle, burst, and delete_burst events
 // ═══════════════════════════════════════════════════
-function attachProcessListeners(ta) {
+function attachProcessListeners(editor) {
 
   // PASTE: Capture what was pasted using clipboardData
-  ta.addEventListener('paste', (e) => {
+  editor.addEventListener('paste', (e) => {
     const pastedText = (e.clipboardData || window.clipboardData).getData('text') || '';
     if (pastedText.length === 0) return;
 
@@ -1387,9 +1447,9 @@ function attachProcessListeners(ta) {
   });
 
   // INPUT: Track char deltas for burst and delete detection
-  ta.addEventListener('input', () => {
+  editor.addEventListener('input', () => {
     const now = Date.now();
-    const currentLength = ta.value.length;
+    const currentLength = editor.value.length;
     const delta = currentLength - STATE.lastTextLength;
 
     // LARGE DELETE: lost 100+ chars in one input event
@@ -1400,7 +1460,7 @@ function attachProcessListeners(ta) {
       });
     }
 
-    // Track burst chars (positive deltas only — we don't count deletions as typing)
+    // Track burst chars (positive deltas only)
     if (delta > 0) {
       STATE.pendingBurstChars += delta;
     }
@@ -1408,6 +1468,21 @@ function attachProcessListeners(ta) {
     STATE.lastInputTime = now;
     STATE.lastTextLength = currentLength;
     updateWordCountDisplay();
+  });
+
+  // RIGHT-CLICK: Log any right-click attempt in the editor
+  editor.addEventListener('contextmenu', (e) => {
+    logEvent('right_click', { content_preview: 'Right-click menu opened in essay area' });
+  });
+
+  // KEYBOARD SHORTCUTS: Catch Ctrl+A, Ctrl+Z (mass undo), Ctrl+V (backup catch)
+  editor.addEventListener('keydown', (e) => {
+    if (!e.ctrlKey && !e.metaKey) return; // Only care about Ctrl/Cmd combos
+    const key = e.key.toLowerCase();
+    const labels = { a: 'Ctrl+A (Select All)', z: 'Ctrl+Z (Undo)', v: 'Ctrl+V (Paste shortcut)', x: 'Ctrl+X (Cut)' };
+    if (labels[key]) {
+      logEvent('shortcut', { content_preview: labels[key] });
+    }
   });
 }
 
@@ -1495,6 +1570,10 @@ async function submitEssay(isAutoSubmit = false) {
   clearInterval(STATE.autosaveInterval);
   clearInterval(STATE.burstCheckInterval);
 
+  // Remove visibility/blur monitors so they don't fire after submission
+  if (STATE._visibilityHandler) document.removeEventListener('visibilitychange', STATE._visibilityHandler);
+  if (STATE._blurHandler) window.removeEventListener('blur', STATE._blurHandler);
+
   // Flush any remaining burst
   if (STATE.pendingBurstChars >= 50) {
     logEvent('burst', { char_count: STATE.pendingBurstChars });
@@ -1503,7 +1582,7 @@ async function submitEssay(isAutoSubmit = false) {
 
   const ta = document.getElementById('essay-textarea');
   const finalText = ta ? ta.value : '';
-  ta.disabled = true;
+  if (ta) ta.disabled = true;
 
   try {
     await db.from('submissions').update({
@@ -1515,7 +1594,6 @@ async function submitEssay(isAutoSubmit = false) {
       last_saved_at: new Date().toISOString(),
     }).eq('id', STATE.submissionId);
 
-    // Build and show the submitted screen
     showSubmittedScreen(finalText);
 
   } catch (err) {
@@ -1528,11 +1606,10 @@ async function submitEssay(isAutoSubmit = false) {
 // ═══════════════════════════════════════════════════
 // SUBMITTED SCREEN — show process summary + read-only essay
 // ═══════════════════════════════════════════════════
-function showSubmittedScreen(essayText) {
+function showSubmittedScreen(text) {
   renderProcessSummary(STATE.processLog);
-  document.getElementById('submitted-essay').value = essayText;
+  document.getElementById('submitted-essay').value = text || '';
   showScreen('submitted');
-  // Auto-copy to clipboard for convenience
   copyToClipboard(true);
 }
 
@@ -1797,14 +1874,20 @@ function renderSubmissionsTable(submissions) {
 
   const rows = submissions.map(s => {
     const log = s.process_log || [];
-    const pastes  = log.filter(e => e.type === 'paste');
-    const idles   = log.filter(e => e.type === 'idle');
+    const pastes     = log.filter(e => e.type === 'paste');
+    const idles      = log.filter(e => e.type === 'idle');
+    const tabHidden  = log.filter(e => e.type === 'tab_hidden' || e.type === 'window_blur');
+    const shortcuts  = log.filter(e => e.type === 'shortcut' || e.type === 'right_click');
+    const wordDrops  = log.filter(e => e.type === 'word_drop');
     const largePaste = pastes.some(e => e.char_count > 200);
 
     const flags = [
-      pastes.length > 0 ? `<span title="${pastes.length} paste event(s)">🚩</span>` : '',
-      largePaste         ? `<span title="Large paste detected (200+ chars)">⚠️</span>` : '',
-      idles.length > 0  ? `<span title="${idles.length} idle gap(s)">🕐</span>` : '',
+      pastes.length > 0    ? `<span title="${pastes.length} paste event(s)">🚩</span>` : '',
+      largePaste            ? `<span title="Large paste (200+ chars)">⚠️</span>` : '',
+      tabHidden.length > 0  ? `<span title="${tabHidden.length} tab/window switch(es)">👁</span>` : '',
+      shortcuts.length > 0  ? `<span title="${shortcuts.length} shortcut/right-click event(s)">⌨️</span>` : '',
+      wordDrops.length > 0  ? `<span title="${wordDrops.length} word count drop(s)">📉</span>` : '',
+      idles.length > 0      ? `<span title="${idles.length} idle gap(s)">🕐</span>` : '',
     ].filter(Boolean).join(' ');
 
     return `
@@ -1818,7 +1901,7 @@ function renderSubmissionsTable(submissions) {
             }</td>
         <td>${s.submitted_at ? formatTime(s.submitted_at) : '—'}</td>
         <td><div class="flag-cell">${flags || '—'}</div></td>
-        <td style="color:var(--muted);font-size:0.78rem">${pastes.length} paste · ${idles.length} idle</td>
+        <td style="color:var(--muted);font-size:0.78rem">${pastes.length} paste · ${tabHidden.length} tab switch · ${idles.length} idle</td>
       </tr>
       ${STATE.expandedSubId === s.id ? renderDetailRow(s) : ''}
     `;
@@ -1870,9 +1953,11 @@ function renderDetailRow(sub) {
             </span>
           </div>
           <div class="detail-flags">
-            ${(sub.process_log || []).some(e => e.type === 'paste') ? '🚩 Paste detected' : ''}
-            ${(sub.process_log || []).some(e => e.char_count > 200 && e.type === 'paste') ? '⚠️ Large paste' : ''}
-            ${(sub.process_log || []).some(e => e.type === 'idle') ? '🕐 Idle gap' : ''}
+            ${(sub.process_log||[]).some(e=>e.type==='paste')             ? '🚩 Paste' : ''}
+            ${(sub.process_log||[]).some(e=>e.char_count>200&&e.type==='paste') ? '⚠️ Large paste' : ''}
+            ${(sub.process_log||[]).some(e=>e.type==='tab_hidden'||e.type==='window_blur') ? '👁 Tab switch' : ''}
+            ${(sub.process_log||[]).some(e=>e.type==='word_drop')         ? '📉 Word drop' : ''}
+            ${(sub.process_log||[]).some(e=>e.type==='idle')              ? '🕐 Idle gap' : ''}
           </div>
         </div>
         <div class="detail-essay">${esc(sub.essay_text || '(no essay text)')}</div>
@@ -1887,9 +1972,14 @@ function getLogDetail(entry) {
   switch (entry.type) {
     case 'paste':        return `${entry.char_count} chars pasted${entry.content_preview ? ': "' + entry.content_preview + '…"' : ''}`;
     case 'burst':        return `${entry.char_count} chars typed in one burst`;
-    case 'idle':         return entry.content_preview || `Idle period`;
+    case 'idle':         return entry.content_preview || 'Idle period';
     case 'delete_burst': return `${entry.char_count} chars deleted at once`;
-    default:             return '';
+    case 'tab_hidden':   return entry.content_preview || 'Tab hidden';
+    case 'window_blur':  return entry.content_preview || 'Window lost focus';
+    case 'right_click':  return entry.content_preview || 'Right-click in essay area';
+    case 'shortcut':     return entry.content_preview || 'Keyboard shortcut used';
+    case 'word_drop':    return entry.content_preview || 'Word count dropped significantly';
+    default:             return entry.content_preview || '';
   }
 }
 
@@ -1918,7 +2008,7 @@ function exportTSV() {
       pastes.length,
       largePaste.length,
       idles.length,
-      // Escape the essay text for TSV (replace newlines with spaces, tabs with spaces)
+      // Strip HTML tags for clean export, replace newlines/tabs
       (s.essay_text || '').replace(/\t/g, ' ').replace(/\n/g, ' ↵ '),
     ].join('\t');
   });
