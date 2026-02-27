@@ -683,7 +683,17 @@
       text-transform: uppercase;
       min-width: 80px;
     }
-    .log-time { color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.72rem; min-width: 50px; }
+    .log-time {
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      min-width: 130px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.1rem;
+    }
+    .log-time .log-wall { color: var(--text); font-weight: 500; }
+    .log-time .log-elapsed { color: var(--muted); font-size: 0.68rem; }
     .log-detail { color: var(--text); flex: 1; }
 
     /* ── WATERMARK BAR ───────────────────────────────── */
@@ -699,6 +709,9 @@
       padding: 0.3rem 1rem;
       flex-shrink: 0;
       user-select: none;
+      position: sticky;
+      top: 52px; /* sits flush below the sticky header */
+      z-index: 99;
     }
 
     .log-entry.tab_hidden  { background: #fdecea; border-left: 3px solid #c0392b; }
@@ -1935,8 +1948,11 @@ function renderDetailRow(sub) {
   const logHtml = log.length
     ? log.map(e => `
         <div class="log-entry ${e.type}">
-          <span class="log-type">${e.type.replace('_', ' ')}</span>
-          <span class="log-time">${formatElapsed(e.elapsed_seconds)}</span>
+          <span class="log-type">${e.type.replace(/_/g, ' ')}</span>
+          <span class="log-time">
+            <span class="log-wall">${formatTime(e.timestamp)}</span>
+            <span class="log-elapsed">${formatElapsed(e.elapsed_seconds)} into test</span>
+          </span>
           <span class="log-detail">${esc(getLogDetail(e))}</span>
         </div>
       `).join('')
