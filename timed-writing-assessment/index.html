@@ -593,6 +593,97 @@
     }
     .empty-panel { padding: 1.5rem; text-align: center; color: var(--muted); font-size: 0.85rem; }
 
+    /* ── Live status panel ─── */
+    .live-panel {
+      padding: 0.85rem 1rem;
+      background: var(--cream);
+      border-bottom: 1px solid var(--border);
+    }
+    .live-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.6rem;
+    }
+    .live-panel-title {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .live-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--success);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
+    .live-updated {
+      font-size: 0.7rem;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+    }
+    .live-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+    .live-col-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.35rem;
+    }
+    .live-col-label.in-progress { color: var(--warning); }
+    .live-col-label.submitted   { color: var(--success); }
+    .live-names {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      max-height: 130px;
+      overflow-y: auto;
+    }
+    .live-name-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      gap: 0.4rem;
+    }
+    .live-name-item.in-progress {
+      background: #fff8e6;
+      border-left: 2px solid var(--gold);
+    }
+    .live-name-item.submitted {
+      background: #eaf5ef;
+      border-left: 2px solid var(--success);
+    }
+    .live-name-text { flex: 1; color: var(--text); }
+    .live-name-time { font-size: 0.68rem; color: var(--muted); white-space: nowrap; }
+    .live-empty { font-size: 0.78rem; color: var(--muted); font-style: italic; padding: 0.2rem 0.4rem; }
+    .rename-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.1rem 0.35rem;
+      font-size: 0.65rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all var(--t);
+      white-space: nowrap;
+    }
+    .rename-btn:hover { border-color: var(--navy); color: var(--navy); background: var(--cream); }
+
     /* ── Submissions panel ─── */
     .submissions-panel { }
     .sub-toolbar {
@@ -986,7 +1077,7 @@
       </div>
       <div style="display:flex;gap:0.6rem;align-items:center">
         <button class="btn btn-secondary" style="font-size:0.78rem;padding:0.45rem 0.8rem" onclick="refreshDashboard()">↻ Refresh</button>
-        <button class="btn btn-secondary" style="font-size:0.78rem;padding:0.45rem 0.8rem" onclick="showScreen('landing')">← Exit</button>
+        <button class="btn btn-secondary" style="font-size:0.78rem;padding:0.45rem 0.8rem" onclick="stopPolling(); showScreen('landing')">← Exit</button>
       </div>
     </div>
   </header>
@@ -1033,6 +1124,26 @@
     <div class="panel submissions-panel">
       <div class="panel-header">
         <h2 id="submissions-panel-title">Submissions</h2>
+      </div>
+      <!-- Live status panel — auto-refreshes every 20s when an assignment is selected -->
+      <div class="live-panel" id="live-panel" style="display:none">
+        <div class="live-panel-header">
+          <div class="live-panel-title">
+            <div class="live-dot"></div>
+            Live Status
+          </div>
+          <span class="live-updated" id="live-updated">—</span>
+        </div>
+        <div class="live-columns">
+          <div>
+            <div class="live-col-label in-progress">✍ In Progress</div>
+            <div class="live-names" id="live-in-progress"></div>
+          </div>
+          <div>
+            <div class="live-col-label submitted">✓ Submitted</div>
+            <div class="live-names" id="live-submitted"></div>
+          </div>
+        </div>
       </div>
       <div class="sub-toolbar">
         <span class="sub-count" id="sub-count">Select an assignment to view submissions.</span>
@@ -1100,6 +1211,9 @@ const STATE = {
   selectedAssignmentId: null,
   allSubmissions: [],
   expandedSubId: null,
+  pollInterval: null,       // auto-refresh interval for live panel
+  lastRefreshedAt: null,    // timestamp of last successful load
+  liveTickInterval: null,   // updates the "X seconds ago" ticker
 };
 
 // ═══════════════════════════════════════════════════
@@ -1660,7 +1774,13 @@ async function loadDashboard() {
 
 function refreshDashboard() {
   loadDashboard();
+  if (STATE.selectedAssignmentId) loadSubmissions(STATE.selectedAssignmentId);
   toast('Dashboard refreshed', 'default', 1500);
+}
+
+function stopPolling() {
+  if (STATE.pollInterval) { clearInterval(STATE.pollInterval); STATE.pollInterval = null; }
+  if (STATE.liveTickInterval) { clearInterval(STATE.liveTickInterval); STATE.liveTickInterval = null; }
 }
 
 // ═══════════════════════════════════════════════════
@@ -1789,13 +1909,38 @@ async function doDeleteAssignment(id) {
 function selectAssignment(id) {
   STATE.selectedAssignmentId = id;
   STATE.expandedSubId = null;
+
+  // Show live panel
+  document.getElementById('live-panel').style.display = 'block';
+
+  // Stop any existing poll before starting a new one
+  if (STATE.pollInterval) clearInterval(STATE.pollInterval);
+  if (STATE.liveTickInterval) clearInterval(STATE.liveTickInterval);
+
+  // Load immediately, then auto-refresh every 20 seconds
   loadSubmissions(id);
-  loadDashboard();
+  STATE.pollInterval = setInterval(() => loadSubmissions(id), 20000);
+
+  // Tick the "X seconds ago" label every second
+  STATE.liveTickInterval = setInterval(updateLiveTicker, 1000);
+
+  loadDashboard(); // Re-render list to show selection highlight
+}
+
+// Updates the "Last updated X seconds ago" ticker in the live panel
+function updateLiveTicker() {
+  const el = document.getElementById('live-updated');
+  if (!el || !STATE.lastRefreshedAt) return;
+  const secs = Math.floor((Date.now() - STATE.lastRefreshedAt) / 1000);
+  el.textContent = secs < 5 ? 'Just updated' : `Updated ${secs}s ago`;
 }
 
 async function loadSubmissions(assignmentId) {
-  document.getElementById('submissions-table-wrap').innerHTML =
-    '<div class="empty-panel" style="padding:2rem">Loading…</div>';
+  // Don't wipe the table on background polls — only show loading on first load
+  if (!STATE.allSubmissions.length) {
+    document.getElementById('submissions-table-wrap').innerHTML =
+      '<div class="empty-panel" style="padding:2rem">Loading…</div>';
+  }
 
   try {
     const { data, error } = await db
@@ -1807,6 +1952,9 @@ async function loadSubmissions(assignmentId) {
     if (error) throw error;
 
     STATE.allSubmissions = data || [];
+    STATE.lastRefreshedAt = Date.now();
+
+    renderLivePanel(data || []);
     renderSubmissionsTable(data || []);
 
     document.getElementById('export-btn').disabled = !data || data.length === 0;
@@ -1815,6 +1963,91 @@ async function loadSubmissions(assignmentId) {
     toast('Failed to load submissions: ' + err.message, 'error');
     document.getElementById('submissions-table-wrap').innerHTML =
       `<div class="empty-panel" style="padding:2rem;color:var(--danger)">Error: ${err.message}</div>`;
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// LIVE STATUS PANEL
+// Shows who is in-progress vs submitted at a glance.
+// Rename button lets you fix a name typo without the student logging out.
+// ═══════════════════════════════════════════════════
+function renderLivePanel(submissions) {
+  const inProgress = submissions.filter(s => !s.is_submitted);
+  const submitted  = submissions.filter(s => s.is_submitted);
+
+  const ipEl = document.getElementById('live-in-progress');
+  const subEl = document.getElementById('live-submitted');
+  if (!ipEl || !subEl) return;
+
+  ipEl.innerHTML = inProgress.length
+    ? inProgress.map(s => `
+        <div class="live-name-item in-progress">
+          <span class="live-name-text">${esc(s.student_name)}</span>
+          <button class="rename-btn" onclick="renameStudent('${s.id}', '${esc(s.student_name)}')">Rename</button>
+        </div>
+      `).join('')
+    : '<div class="live-empty">No one writing yet</div>';
+
+  subEl.innerHTML = submitted.length
+    ? submitted.map(s => `
+        <div class="live-name-item submitted">
+          <span class="live-name-text">${esc(s.student_name)}</span>
+          <span class="live-name-time">${s.submitted_at ? formatTime(s.submitted_at) : ''}</span>
+        </div>
+      `).join('')
+    : '<div class="live-empty">No submissions yet</div>';
+}
+
+// Opens a modal to rename a student — corrects typos without disrupting their session.
+// The student's browser will pick up the corrected name on next autosave or page reload.
+function renameStudent(subId, currentName) {
+  openModal(`
+    <div class="modal-header">
+      <h3>Rename Student</h3>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      Correct the name for this submission. The student does not need to do anything.
+      <div class="form-group" style="margin-top:0.85rem">
+        <label>Student Name</label>
+        <input class="form-input" id="rename-input" type="text" value="${esc(currentName)}"
+          onkeydown="if(event.key==='Enter') { closeModal(); doRenameStudent('${subId}', document.getElementById('rename-input').value.trim()); }">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="
+        const newName = document.getElementById('rename-input').value.trim();
+        closeModal();
+        doRenameStudent('${subId}', newName);
+      ">Save Name</button>
+    </div>
+  `);
+  // Auto-select the text so teacher can type immediately
+  setTimeout(() => {
+    const inp = document.getElementById('rename-input');
+    if (inp) { inp.focus(); inp.select(); }
+  }, 100);
+}
+
+async function doRenameStudent(subId, newName) {
+  if (!newName) { toast('Name cannot be empty', 'warning'); return; }
+  try {
+    const { error } = await db
+      .from('submissions')
+      .update({ student_name: newName })
+      .eq('id', subId);
+
+    if (error) throw error;
+
+    toast(`Name updated to "${newName}"`, 'success');
+
+    // Reload to reflect the change everywhere
+    if (STATE.selectedAssignmentId) {
+      loadSubmissions(STATE.selectedAssignmentId);
+    }
+  } catch (err) {
+    toast('Rename failed: ' + err.message, 'error');
   }
 }
 
