@@ -1945,6 +1945,21 @@ async function doDeleteAssignment(id) {
 // SUBMISSIONS VIEWER
 // ═══════════════════════════════════════════════════
 function selectAssignment(id) {
+  // Toggle off if already selected
+  if (STATE.selectedAssignmentId === id) {
+    STATE.selectedAssignmentId = null;
+    STATE.allSubmissions = [];
+    STATE.expandedSubId = null;
+    if (STATE.pollInterval) { clearInterval(STATE.pollInterval); STATE.pollInterval = null; }
+    if (STATE.liveTickInterval) { clearInterval(STATE.liveTickInterval); STATE.liveTickInterval = null; }
+    document.getElementById('live-panel').style.display = 'none';
+    document.getElementById('submissions-table-wrap').innerHTML =
+      '<div class="empty-panel" style="padding:3rem">Select an assignment on the left to view its submissions.</div>';
+    document.getElementById('sub-count').textContent = 'Select an assignment to view submissions.';
+    document.getElementById('export-btn').disabled = true;
+    loadDashboard();
+    return;
+  }
   STATE.selectedAssignmentId = id;
   STATE.expandedSubId = null;
 
