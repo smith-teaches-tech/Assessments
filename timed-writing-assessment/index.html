@@ -808,7 +808,9 @@
     }
 
     .log-entry.tab_hidden  { background: #fdecea; border-left: 3px solid #c0392b; }
+    .log-entry.tab_return  { background: #e8f4fd; border-left: 3px solid #2980b9; }
     .log-entry.window_blur { background: #fdecea; border-left: 3px solid #c0392b; }
+    .log-entry.window_return { background: #e8f4fd; border-left: 3px solid #2980b9; }
     .log-entry.right_click { background: #fff3e0; border-left: 3px solid #e67e22; }
     .log-entry.shortcut    { background: #fff3e0; border-left: 3px solid #e67e22; }
     .log-entry.word_drop   { background: #fdecea; border-left: 3px solid #c0392b; }
@@ -1208,6 +1210,9 @@ const STATE = {
   sessionStartTime: null,
   _visibilityHandler: null,
   _blurHandler: null,
+  _focusHandler: null,
+  tabLeftAt: null,          // timestamp when student left the tab
+  windowLeftAt: null,       // timestamp when student left the window
   selectedAssignmentId: null,
   allSubmissions: [],
   expandedSubId: null,
@@ -1411,19 +1416,43 @@ function enterWritingMode(savedText) {
 
   attachProcessListeners(editor);
 
+  // ── Tab visibility — logs when student leaves AND returns, with duration ──
   STATE._visibilityHandler = () => {
     if (document.hidden) {
+      STATE.tabLeftAt = Date.now();
       logEvent('tab_hidden', { content_preview: 'Student switched tabs or minimized browser' });
+    } else {
+      if (STATE.tabLeftAt) {
+        const gapSeconds = Math.round((Date.now() - STATE.tabLeftAt) / 1000);
+        logEvent('tab_return', {
+          char_count: gapSeconds,
+          content_preview: `Returned after ${formatDuration(gapSeconds)}`,
+        });
+        STATE.tabLeftAt = null;
+      }
     }
   };
   document.addEventListener('visibilitychange', STATE._visibilityHandler);
 
+  // ── Window blur/focus — logs when student switches to another app ──
   STATE._blurHandler = () => {
     if (!document.hidden) {
+      STATE.windowLeftAt = Date.now();
       logEvent('window_blur', { content_preview: 'Student switched to another application' });
     }
   };
+  STATE._focusHandler = () => {
+    if (STATE.windowLeftAt) {
+      const gapSeconds = Math.round((Date.now() - STATE.windowLeftAt) / 1000);
+      logEvent('window_return', {
+        char_count: gapSeconds,
+        content_preview: `Returned after ${formatDuration(gapSeconds)}`,
+      });
+      STATE.windowLeftAt = null;
+    }
+  };
   window.addEventListener('blur', STATE._blurHandler);
+  window.addEventListener('focus', STATE._focusHandler);
 
   setTimeout(() => {
     const ta = document.getElementById('essay-textarea');
@@ -1657,6 +1686,7 @@ async function submitEssay(isAutoSubmit = false) {
 
   if (STATE._visibilityHandler) document.removeEventListener('visibilitychange', STATE._visibilityHandler);
   if (STATE._blurHandler) window.removeEventListener('blur', STATE._blurHandler);
+  if (STATE._focusHandler) window.removeEventListener('focus', STATE._focusHandler);
 
   if (STATE.pendingBurstChars >= 50) {
     logEvent('burst', { char_count: STATE.pendingBurstChars });
@@ -2068,8 +2098,7 @@ function renderSubmissionsTable(submissions) {
     const log = s.process_log || [];
     const pastes     = log.filter(e => e.type === 'paste');
     const idles      = log.filter(e => e.type === 'idle');
-    const tabHidden  = log.filter(e => e.type === 'tab_hidden' || e.type === 'window_blur');
-    const shortcuts  = log.filter(e => e.type === 'shortcut' || e.type === 'right_click');
+    const tabHidden  = log.filter(e => e.type === 'tab_hidden' || e.type === 'window_blur');    const shortcuts  = log.filter(e => e.type === 'shortcut' || e.type === 'right_click');
     const wordDrops  = log.filter(e => e.type === 'word_drop');
     const largePaste = pastes.some(e => e.char_count > 200);
 
@@ -2093,7 +2122,7 @@ function renderSubmissionsTable(submissions) {
             }</td>
         <td>${s.submitted_at ? formatTime(s.submitted_at) : '—'}</td>
         <td><div class="flag-cell">${flags || '—'}</div></td>
-        <td style="color:var(--muted);font-size:0.78rem">${pastes.length} paste · ${tabHidden.length} tab switch · ${idles.length} idle</td>
+        <td style="color:var(--muted);font-size:0.78rem">${pastes.length} paste · ${tabHidden.length} tab switch · ${idles.length} idle${longestTabGap(log) ? ' · longest away: ' + longestTabGap(log) : ''}</td>
       </tr>
       ${STATE.expandedSubId === s.id ? renderDetailRow(s) : ''}
     `;
@@ -2293,18 +2322,39 @@ function formatElapsed(secs) {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
+// Human-readable duration from seconds: "4m 12s", "45s", "1h 2m"
+function formatDuration(secs) {
+  if (secs < 60) return `${secs}s`;
+  const m = Math.floor(secs / 60);
+  const s = secs % 60;
+  if (m < 60) return s > 0 ? `${m}m ${s}s` : `${m}m`;
+  const h = Math.floor(m / 60);
+  const rm = m % 60;
+  return rm > 0 ? `${h}h ${rm}m` : `${h}h`;
+}
+
+// Returns formatted duration of the longest tab/window absence in a process log
+function longestTabGap(log) {
+  const returnEvents = log.filter(e => e.type === 'tab_return' || e.type === 'window_return');
+  if (!returnEvents.length) return null;
+  const max = Math.max(...returnEvents.map(e => e.char_count || 0));
+  return max > 0 ? formatDuration(max) : null;
+}
+
 function getLogDetail(entry) {
   switch (entry.type) {
-    case 'paste':        return `${entry.char_count} chars pasted${entry.content_preview ? ': "' + entry.content_preview + '…"' : ''}`;
-    case 'burst':        return `${entry.char_count} chars typed in one burst`;
-    case 'idle':         return entry.content_preview || 'Idle period';
-    case 'delete_burst': return `${entry.char_count} chars deleted at once`;
-    case 'tab_hidden':   return entry.content_preview || 'Tab hidden';
-    case 'window_blur':  return entry.content_preview || 'Window lost focus';
-    case 'right_click':  return entry.content_preview || 'Right-click in essay area';
-    case 'shortcut':     return entry.content_preview || 'Keyboard shortcut used';
-    case 'word_drop':    return entry.content_preview || 'Word count dropped significantly';
-    default:             return entry.content_preview || '';
+    case 'paste':         return `${entry.char_count} chars pasted${entry.content_preview ? ': "' + entry.content_preview + '…"' : ''}`;
+    case 'burst':         return `${entry.char_count} chars typed in one burst`;
+    case 'idle':          return entry.content_preview || 'Idle period';
+    case 'delete_burst':  return `${entry.char_count} chars deleted at once`;
+    case 'tab_hidden':    return entry.content_preview || 'Tab hidden';
+    case 'tab_return':    return entry.content_preview || `Returned to tab`;
+    case 'window_blur':   return entry.content_preview || 'Window lost focus';
+    case 'window_return': return entry.content_preview || 'Returned to window';
+    case 'right_click':   return entry.content_preview || 'Right-click in essay area';
+    case 'shortcut':      return entry.content_preview || 'Keyboard shortcut used';
+    case 'word_drop':     return entry.content_preview || 'Word count dropped significantly';
+    default:              return entry.content_preview || '';
   }
 }
 
