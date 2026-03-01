@@ -346,6 +346,14 @@
       cursor: not-allowed;
       color: var(--muted);
     }
+    /* Suppress underlines injected by browser extensions (LanguageTool, MS Editor, etc.)
+       Can't block all extensions but this kills most visual hints */
+    #essay-textarea {
+      text-decoration: none !important;
+      -webkit-text-decorations-in-effect: none !important;
+    }
+    #essay-textarea::spelling-error { text-decoration: none !important; }
+    #essay-textarea::grammar-error  { text-decoration: none !important; }
 
     /* Submit bar */
     .writing-footer {
