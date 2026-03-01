@@ -1424,11 +1424,12 @@ function enterWritingMode(savedText) {
 
   attachProcessListeners(editor);
 
-  // ── Tab visibility — logs when student leaves AND returns, with duration ──
+  // ── Tab visibility — most reliable signal for "left this tab" ──
+  // Fires when student switches tabs, minimizes, or the screen locks
   STATE._visibilityHandler = () => {
     if (document.hidden) {
       STATE.tabLeftAt = Date.now();
-      logEvent('tab_hidden', { content_preview: 'Student switched tabs or minimized browser' });
+      logEvent('tab_hidden', { content_preview: 'Left tab (switched tabs or minimized)' });
     } else {
       if (STATE.tabLeftAt) {
         const gapSeconds = Math.round((Date.now() - STATE.tabLeftAt) / 1000);
@@ -1442,20 +1443,26 @@ function enterWritingMode(savedText) {
   };
   document.addEventListener('visibilitychange', STATE._visibilityHandler);
 
-  // ── Window blur/focus — logs when student switches to another app ──
+  // ── Window blur/focus — catches Alt+Tab to another app without changing tabs ──
+  // Deduplicates against tab_hidden: if a visibility change fired within 2 seconds,
+  // skip the blur log — it's the same event, not a separate app switch.
   STATE._blurHandler = () => {
-    if (!document.hidden) {
+    const recentTabHidden = STATE.tabLeftAt && (Date.now() - STATE.tabLeftAt) < 2000;
+    if (!recentTabHidden) {
       STATE.windowLeftAt = Date.now();
-      logEvent('window_blur', { content_preview: 'Student switched to another application' });
+      logEvent('window_blur', { content_preview: 'Switched to another application (Alt+Tab or similar)' });
     }
   };
   STATE._focusHandler = () => {
     if (STATE.windowLeftAt) {
       const gapSeconds = Math.round((Date.now() - STATE.windowLeftAt) / 1000);
-      logEvent('window_return', {
-        char_count: gapSeconds,
-        content_preview: `Returned after ${formatDuration(gapSeconds)}`,
-      });
+      // Only log if it was a meaningful gap (>1 second) to filter notification blips
+      if (gapSeconds >= 1) {
+        logEvent('window_return', {
+          char_count: gapSeconds,
+          content_preview: `Returned from other application after ${formatDuration(gapSeconds)}`,
+        });
+      }
       STATE.windowLeftAt = null;
     }
   };
