@@ -121,6 +121,8 @@
     .btn-danger { background: var(--danger); color: #fff; border-color: var(--danger); }
     .btn-danger:hover { background: #a93226; }
     .btn-success { background: var(--success); color: #fff; border-color: var(--success); }
+    .btn-warning { background: var(--warning); color: #fff; border-color: var(--warning); }
+    .btn-warning:hover { background: #8a6600; }
     .btn-lg { padding: 0.85rem 1.75rem; font-size: 0.95rem; }
     .btn-block { width: 100%; }
     .btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
@@ -710,7 +712,7 @@
       flex-shrink: 0;
       user-select: none;
       position: sticky;
-      top: 52px; /* sits flush below the sticky header */
+      top: 52px;
       z-index: 99;
     }
 
@@ -897,13 +899,17 @@
   <div class="watermark-bar" id="watermark-bar">● smith-teaches-tech · assessment in progress ●</div>
 
   <div class="writing-main">
+    <!-- CHANGE 1: Added Grammarly-blocking attributes + updated placeholder text -->
     <textarea
       id="essay-textarea"
-      placeholder="Begin writing here. Your work is saved automatically every 30 seconds."
+      placeholder="Begin writing here. Your work is saved automatically every 15 seconds."
       spellcheck="false"
       autocorrect="off"
       autocapitalize="off"
       autocomplete="off"
+      data-gramm="false"
+      data-gramm_editor="false"
+      data-enable-grammarly="false"
     ></textarea>
   </div>
 
@@ -928,10 +934,8 @@
       ✓ Your essay has been submitted and recorded. You cannot edit it further.
     </div>
 
-    <!-- Process summary shown after submission -->
     <div class="process-summary" id="process-summary"></div>
 
-    <!-- Essay read-only copy -->
     <div class="submitted-essay-wrap">
       <div class="submitted-toolbar">
         <span class="submitted-label">Your Submitted Essay</span>
@@ -1062,7 +1066,7 @@
 // ═══════════════════════════════════════════════════
 const SUPABASE_URL     = 'https://opxejwarxyuqyafysqvk.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_A7iE6EknGVEEOTLZiof8xw_TjC2VdSK';
-const TEACHER_PASSWORD  = 'IhateAIcheaters'; // ← set this before deploying
+const TEACHER_PASSWORD  = 'IhateAIcheaters';
 
 // ═══════════════════════════════════════════════════
 // SUPABASE CLIENT INIT
@@ -1072,36 +1076,30 @@ const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ═══════════════════════════════════════════════════
 // APP STATE
-// Holds all runtime info — kept simple and flat
 // ═══════════════════════════════════════════════════
 const STATE = {
-  // Student session
-  submissionId: null,       // uuid of current submission row
-  assignmentId: null,       // uuid of active assignment
+  submissionId: null,
+  assignmentId: null,
   assignmentTitle: null,
   timeLimitSeconds: 0,
   studentName: null,
   period: null,
-  startedAt: null,          // ISO string from DB (when essay was first started)
-  timerInterval: null,      // setInterval handle for countdown
-  autosaveInterval: null,   // setInterval handle for autosave
-  processLog: [],           // array of log event objects (appended to during session)
+  startedAt: null,
+  timerInterval: null,
+  autosaveInterval: null,
+  processLog: [],
   isSubmitted: false,
-
-  // Process log tracking vars
   lastInputTime: null,
   lastTextLength: 0,
-  lastWordCount: 0,      // for word-drop detection in autosave
+  lastWordCount: 0,
   pendingBurstChars: 0,
   burstCheckInterval: null,
   sessionStartTime: null,
-  _visibilityHandler: null,  // stored so we can remove on submit
-  _blurHandler: null,        // stored so we can remove on submit
-
-  // Teacher session
-  selectedAssignmentId: null,   // assignment being viewed in dashboard
-  allSubmissions: [],           // loaded submissions for selected assignment
-  expandedSubId: null,          // which submission row is expanded
+  _visibilityHandler: null,
+  _blurHandler: null,
+  selectedAssignmentId: null,
+  allSubmissions: [],
+  expandedSubId: null,
 };
 
 // ═══════════════════════════════════════════════════
@@ -1153,9 +1151,6 @@ function countWords(text) {
 
 // ═══════════════════════════════════════════════════
 // ELAPSED SECONDS SINCE STARTED
-// Uses started_at (ISO string) stored in Supabase
-// NOTE: If student has the page open for days, timer will over-count.
-// For timed exams, this is intentional — clock runs on wall time.
 // ═══════════════════════════════════════════════════
 function elapsedSeconds() {
   if (!STATE.startedAt) return 0;
@@ -1185,7 +1180,6 @@ async function studentLogin() {
   btn.textContent = 'Checking…';
 
   try {
-    // 1. Find an active assignment matching the password
     const { data: assignments, error: aErr } = await db
       .from('assignments')
       .select('*')
@@ -1202,7 +1196,6 @@ async function studentLogin() {
 
     const assignment = assignments[0];
 
-    // 2. Check if a submission already exists for this student + assignment
     const { data: existing, error: sErr } = await db
       .from('submissions')
       .select('*')
@@ -1213,29 +1206,25 @@ async function studentLogin() {
     if (sErr) throw sErr;
 
     if (existing) {
-      // Resuming an existing session
       if (existing.is_submitted) {
-        // Already done — show the locked submitted screen
         loadSubmittedScreen(existing, assignment);
         showScreen('submitted');
         return;
       }
 
-      // Resume writing
-      STATE.submissionId   = existing.id;
-      STATE.assignmentId   = assignment.id;
+      STATE.submissionId    = existing.id;
+      STATE.assignmentId    = assignment.id;
       STATE.assignmentTitle = assignment.title;
       STATE.timeLimitSeconds = assignment.time_limit_minutes * 60;
-      STATE.studentName    = name;
-      STATE.period         = period;
-      STATE.startedAt      = existing.started_at;
-      STATE.processLog     = existing.process_log || [];
-      STATE.isSubmitted    = false;
+      STATE.studentName     = name;
+      STATE.period          = period;
+      STATE.startedAt       = existing.started_at;
+      STATE.processLog      = existing.process_log || [];
+      STATE.isSubmitted     = false;
 
       enterWritingMode(existing.essay_text || '');
 
     } else {
-      // Brand new submission
       const now = new Date().toISOString();
       const { data: newSub, error: nErr } = await db
         .from('submissions')
@@ -1254,15 +1243,15 @@ async function studentLogin() {
 
       if (nErr) throw nErr;
 
-      STATE.submissionId   = newSub.id;
-      STATE.assignmentId   = assignment.id;
+      STATE.submissionId    = newSub.id;
+      STATE.assignmentId    = assignment.id;
       STATE.assignmentTitle = assignment.title;
       STATE.timeLimitSeconds = assignment.time_limit_minutes * 60;
-      STATE.studentName    = name;
-      STATE.period         = period;
-      STATE.startedAt      = now;
-      STATE.processLog     = [];
-      STATE.isSubmitted    = false;
+      STATE.studentName     = name;
+      STATE.period          = period;
+      STATE.startedAt       = now;
+      STATE.processLog      = [];
+      STATE.isSubmitted     = false;
 
       enterWritingMode('');
     }
@@ -1279,15 +1268,12 @@ async function studentLogin() {
 
 // ═══════════════════════════════════════════════════
 // ENTER WRITING MODE
-// Sets up the writing screen, starts timer + autosave + logging
 // ═══════════════════════════════════════════════════
 function enterWritingMode(savedText) {
-  // Populate header
   document.getElementById('writing-title').textContent = STATE.assignmentTitle;
   document.getElementById('writing-student').textContent =
     `${STATE.studentName} · ${STATE.period}`;
 
-  // Set up textarea
   const editor = document.getElementById('essay-textarea');
   editor.value = savedText || '';
   editor.disabled = false;
@@ -1296,26 +1282,21 @@ function enterWritingMode(savedText) {
 
   showScreen('writing');
 
-  // Check if time already expired (resuming a timed-out session)
   const remaining = STATE.timeLimitSeconds - elapsedSeconds();
   if (remaining <= 0) {
     autoSubmit('Timer had already expired.');
     return;
   }
 
-  // Start the countdown timer
   startTimer();
 
-  // Start autosave every 30 seconds
-  STATE.autosaveInterval = setInterval(autosave, 30000);
+  // CHANGE 2: Autosave every 15 seconds (was 30)
+  STATE.autosaveInterval = setInterval(autosave, 15000);
 
-  // Start process event monitoring (checks every 3 seconds for idle/burst)
   STATE.burstCheckInterval = setInterval(checkBurstAndIdle, 3000);
 
-  // Attach process event listeners to the textarea
   attachProcessListeners(editor);
 
-  // ── Tab visibility (Page Visibility API) ──
   STATE._visibilityHandler = () => {
     if (document.hidden) {
       logEvent('tab_hidden', { content_preview: 'Student switched tabs or minimized browser' });
@@ -1323,7 +1304,6 @@ function enterWritingMode(savedText) {
   };
   document.addEventListener('visibilitychange', STATE._visibilityHandler);
 
-  // ── Window blur ──
   STATE._blurHandler = () => {
     if (!document.hidden) {
       logEvent('window_blur', { content_preview: 'Student switched to another application' });
@@ -1331,7 +1311,6 @@ function enterWritingMode(savedText) {
   };
   window.addEventListener('blur', STATE._blurHandler);
 
-  // Focus the textarea
   setTimeout(() => {
     const ta = document.getElementById('essay-textarea');
     if (ta) ta.focus();
@@ -1342,10 +1321,9 @@ function enterWritingMode(savedText) {
 // TIMER
 // ═══════════════════════════════════════════════════
 function startTimer() {
-  // Clear any existing timer
   if (STATE.timerInterval) clearInterval(STATE.timerInterval);
 
-  updateTimerDisplay(); // Render immediately
+  updateTimerDisplay();
 
   STATE.timerInterval = setInterval(() => {
     const remaining = STATE.timeLimitSeconds - elapsedSeconds();
@@ -1371,10 +1349,9 @@ function updateTimerDisplay(remainingOverride) {
   const s = secs % 60;
   el.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 
-  // Color shifts as time runs low
   el.classList.remove('warning', 'danger');
-  if (secs <= 300) el.classList.add('danger');       // under 5 min
-  else if (secs <= 600) el.classList.add('warning'); // under 10 min
+  if (secs <= 300) el.classList.add('danger');
+  else if (secs <= 600) el.classList.add('warning');
 }
 
 // ═══════════════════════════════════════════════════
@@ -1397,7 +1374,6 @@ async function autosave() {
   const text = ta.value;
   const currentWordCount = countWords(text);
 
-  // WORD DROP: If essay loses 50+ words between saves, log it
   if (STATE.lastWordCount > 50 && (STATE.lastWordCount - currentWordCount) >= 50) {
     logEvent('word_drop', {
       char_count: STATE.lastWordCount - currentWordCount,
@@ -1431,12 +1407,9 @@ async function autosave() {
       indicator.className = 'autosave-indicator';
       indicator.textContent = 'Save failed — retrying…';
     }
-    // NOTE: If autosave fails repeatedly, student work could be lost.
-    // Consider adding a localStorage backup here for extra resilience.
   }
 }
 
-// Manual save (the "Save Now" button)
 async function manualSave() {
   await autosave();
   toast('Saved!', 'success', 1500);
@@ -1444,28 +1417,23 @@ async function manualSave() {
 
 // ═══════════════════════════════════════════════════
 // PROCESS LOGGING
-// Captures paste, idle, burst, and delete_burst events
 // ═══════════════════════════════════════════════════
 function attachProcessListeners(editor) {
 
-  // PASTE: Capture what was pasted using clipboardData
   editor.addEventListener('paste', (e) => {
     const pastedText = (e.clipboardData || window.clipboardData).getData('text') || '';
     if (pastedText.length === 0) return;
-
     logEvent('paste', {
       char_count:      pastedText.length,
       content_preview: pastedText.slice(0, 80),
     });
   });
 
-  // INPUT: Track char deltas for burst and delete detection
   editor.addEventListener('input', () => {
     const now = Date.now();
     const currentLength = editor.value.length;
     const delta = currentLength - STATE.lastTextLength;
 
-    // LARGE DELETE: lost 100+ chars in one input event
     if (delta <= -100) {
       logEvent('delete_burst', {
         char_count: Math.abs(delta),
@@ -1473,7 +1441,6 @@ function attachProcessListeners(editor) {
       });
     }
 
-    // Track burst chars (positive deltas only)
     if (delta > 0) {
       STATE.pendingBurstChars += delta;
     }
@@ -1483,14 +1450,12 @@ function attachProcessListeners(editor) {
     updateWordCountDisplay();
   });
 
-  // RIGHT-CLICK: Log any right-click attempt in the editor
   editor.addEventListener('contextmenu', (e) => {
     logEvent('right_click', { content_preview: 'Right-click menu opened in essay area' });
   });
 
-  // KEYBOARD SHORTCUTS: Catch Ctrl+A, Ctrl+Z (mass undo), Ctrl+V (backup catch)
   editor.addEventListener('keydown', (e) => {
-    if (!e.ctrlKey && !e.metaKey) return; // Only care about Ctrl/Cmd combos
+    if (!e.ctrlKey && !e.metaKey) return;
     const key = e.key.toLowerCase();
     const labels = { a: 'Ctrl+A (Select All)', z: 'Ctrl+Z (Undo)', v: 'Ctrl+V (Paste shortcut)', x: 'Ctrl+X (Cut)' };
     if (labels[key]) {
@@ -1499,11 +1464,9 @@ function attachProcessListeners(editor) {
   });
 }
 
-// Called every 3 seconds by burstCheckInterval
-// Evaluates whether a typing burst or idle gap should be logged
 let lastBurstFlushTime = Date.now();
 let lastActiveTime = Date.now();
-let idleLogged = false; // Prevent duplicate idle events for one gap
+let idleLogged = false;
 
 function checkBurstAndIdle() {
   if (STATE.isSubmitted) return;
@@ -1513,29 +1476,25 @@ function checkBurstAndIdle() {
     ? (now - STATE.lastInputTime) / 1000
     : Infinity;
 
-  // BURST: flush if student paused for >5 seconds AND typed 50+ chars
   if (secsSinceInput > 5 && STATE.pendingBurstChars >= 50) {
     logEvent('burst', { char_count: STATE.pendingBurstChars });
     STATE.pendingBurstChars = 0;
     lastBurstFlushTime = now;
   }
 
-  // IDLE: student hasn't typed in 2+ minutes
   if (secsSinceInput > 120 && !idleLogged && STATE.lastInputTime) {
     logEvent('idle', {
       char_count: 0,
       content_preview: `Gap of ~${Math.round(secsSinceInput / 60)} minute(s)`,
     });
-    idleLogged = true; // Only log once per idle gap
+    idleLogged = true;
   }
 
-  // Reset idle flag when student types again
   if (secsSinceInput < 30 && idleLogged) {
     idleLogged = false;
   }
 }
 
-// ── Helper: push an event to the process log ──
 function logEvent(type, extras = {}) {
   const entry = {
     type,
@@ -1545,7 +1504,7 @@ function logEvent(type, extras = {}) {
     content_preview: extras.content_preview || '',
   };
   STATE.processLog.push(entry);
-  console.log('[ProcessLog]', entry); // visible in DevTools if needed
+  console.log('[ProcessLog]', entry);
 }
 
 // ═══════════════════════════════════════════════════
@@ -1578,16 +1537,13 @@ async function submitEssay(isAutoSubmit = false) {
   if (STATE.isSubmitted) return;
   STATE.isSubmitted = true;
 
-  // Stop timer and autosave loops
   clearInterval(STATE.timerInterval);
   clearInterval(STATE.autosaveInterval);
   clearInterval(STATE.burstCheckInterval);
 
-  // Remove visibility/blur monitors so they don't fire after submission
   if (STATE._visibilityHandler) document.removeEventListener('visibilitychange', STATE._visibilityHandler);
   if (STATE._blurHandler) window.removeEventListener('blur', STATE._blurHandler);
 
-  // Flush any remaining burst
   if (STATE.pendingBurstChars >= 50) {
     logEvent('burst', { char_count: STATE.pendingBurstChars });
     STATE.pendingBurstChars = 0;
@@ -1611,13 +1567,13 @@ async function submitEssay(isAutoSubmit = false) {
 
   } catch (err) {
     console.error('Submit failed:', err);
-    STATE.isSubmitted = false; // Allow retry
+    STATE.isSubmitted = false;
     toast('Submission failed. Please try again: ' + err.message, 'error', 8000);
   }
 }
 
 // ═══════════════════════════════════════════════════
-// SUBMITTED SCREEN — show process summary + read-only essay
+// SUBMITTED SCREEN
 // ═══════════════════════════════════════════════════
 function showSubmittedScreen(text) {
   renderProcessSummary(STATE.processLog);
@@ -1626,7 +1582,6 @@ function showSubmittedScreen(text) {
   copyToClipboard(true);
 }
 
-// Used when resuming an already-submitted session
 function loadSubmittedScreen(submission, assignment) {
   renderProcessSummary(submission.process_log || []);
   document.getElementById('submitted-essay').value = submission.essay_text || '';
@@ -1657,7 +1612,6 @@ async function copyToClipboard(silent = false) {
     await navigator.clipboard.writeText(ta.value);
     if (!silent) toast('Essay copied to clipboard!', 'success');
   } catch (e) {
-    // Fallback for browsers that block clipboard API
     ta.select();
     document.execCommand('copy');
     if (!silent) toast('Essay copied!', 'success');
@@ -1666,10 +1620,6 @@ async function copyToClipboard(silent = false) {
 
 // ═══════════════════════════════════════════════════
 // TEACHER LOGIN
-// Password is checked client-side (hardcoded above)
-// NOTE: This is appropriate for a school internal tool.
-// The teacher password gates the dashboard UI only —
-// Supabase RLS should be used if truly sensitive data is needed.
 // ═══════════════════════════════════════════════════
 function teacherLogin() {
   const pw = document.getElementById('t-password').value;
@@ -1687,7 +1637,7 @@ function teacherLogin() {
 }
 
 // ═══════════════════════════════════════════════════
-// TEACHER DASHBOARD — Load and render
+// TEACHER DASHBOARD
 // ═══════════════════════════════════════════════════
 async function loadDashboard() {
   try {
@@ -1699,7 +1649,6 @@ async function loadDashboard() {
     if (error) throw error;
     renderAssignmentList(data || []);
 
-    // If an assignment was previously selected, reload its submissions
     if (STATE.selectedAssignmentId) {
       loadSubmissions(STATE.selectedAssignmentId);
     }
@@ -1772,7 +1721,6 @@ async function createAssignment() {
     });
     if (error) throw error;
 
-    // Clear form
     document.getElementById('a-title').value    = '';
     document.getElementById('a-password').value = '';
     document.getElementById('a-time').value     = '';
@@ -1787,7 +1735,6 @@ async function createAssignment() {
 async function toggleActive(assignmentId, makeActive) {
   try {
     if (makeActive) {
-      // Deactivate all others first — only one assignment active at a time
       await db.from('assignments').update({ is_active: false }).neq('id', assignmentId);
     }
     await db.from('assignments').update({ is_active: makeActive }).eq('id', assignmentId);
@@ -1817,7 +1764,6 @@ async function deleteAssignment(id, title) {
 
 async function doDeleteAssignment(id) {
   try {
-    // Delete submissions first (foreign key constraint)
     await db.from('submissions').delete().eq('assignment_id', id);
     await db.from('assignments').delete().eq('id', id);
 
@@ -1844,7 +1790,7 @@ function selectAssignment(id) {
   STATE.selectedAssignmentId = id;
   STATE.expandedSubId = null;
   loadSubmissions(id);
-  loadDashboard(); // Re-render list to show selection highlight
+  loadDashboard();
 }
 
 async function loadSubmissions(assignmentId) {
@@ -1943,6 +1889,9 @@ function toggleSubmissionDetail(subId) {
   renderSubmissionsTable(STATE.allSubmissions);
 }
 
+// CHANGE 3: Added "Return to Student" button in the detail row
+// This flips is_submitted back to false so the student can resume writing.
+// The student just refreshes and re-enters their name and password.
 function renderDetailRow(sub) {
   const log = sub.process_log || [];
   const logHtml = log.length
@@ -1968,12 +1917,21 @@ function renderDetailRow(sub) {
               ${sub.word_count || 0} words · Started ${formatTime(sub.started_at)}
             </span>
           </div>
-          <div class="detail-flags">
-            ${(sub.process_log||[]).some(e=>e.type==='paste')             ? '🚩 Paste' : ''}
-            ${(sub.process_log||[]).some(e=>e.char_count>200&&e.type==='paste') ? '⚠️ Large paste' : ''}
-            ${(sub.process_log||[]).some(e=>e.type==='tab_hidden'||e.type==='window_blur') ? '👁 Tab switch' : ''}
-            ${(sub.process_log||[]).some(e=>e.type==='word_drop')         ? '📉 Word drop' : ''}
-            ${(sub.process_log||[]).some(e=>e.type==='idle')              ? '🕐 Idle gap' : ''}
+          <div style="display:flex;gap:0.5rem;align-items:center">
+            <div class="detail-flags">
+              ${(sub.process_log||[]).some(e=>e.type==='paste')             ? '🚩 Paste' : ''}
+              ${(sub.process_log||[]).some(e=>e.char_count>200&&e.type==='paste') ? '⚠️ Large paste' : ''}
+              ${(sub.process_log||[]).some(e=>e.type==='tab_hidden'||e.type==='window_blur') ? '👁 Tab switch' : ''}
+              ${(sub.process_log||[]).some(e=>e.type==='word_drop')         ? '📉 Word drop' : ''}
+              ${(sub.process_log||[]).some(e=>e.type==='idle')              ? '🕐 Idle gap' : ''}
+            </div>
+            ${sub.is_submitted
+              ? `<button class="btn btn-warning" style="font-size:0.72rem;padding:0.3rem 0.7rem"
+                   onclick="event.stopPropagation(); returnToStudent('${sub.id}', '${esc(sub.student_name)}')">
+                   ↩ Return to Student
+                 </button>`
+              : ''
+            }
           </div>
         </div>
         <div class="detail-essay">${esc(sub.essay_text || '(no essay text)')}</div>
@@ -1984,23 +1942,53 @@ function renderDetailRow(sub) {
   `;
 }
 
-function getLogDetail(entry) {
-  switch (entry.type) {
-    case 'paste':        return `${entry.char_count} chars pasted${entry.content_preview ? ': "' + entry.content_preview + '…"' : ''}`;
-    case 'burst':        return `${entry.char_count} chars typed in one burst`;
-    case 'idle':         return entry.content_preview || 'Idle period';
-    case 'delete_burst': return `${entry.char_count} chars deleted at once`;
-    case 'tab_hidden':   return entry.content_preview || 'Tab hidden';
-    case 'window_blur':  return entry.content_preview || 'Window lost focus';
-    case 'right_click':  return entry.content_preview || 'Right-click in essay area';
-    case 'shortcut':     return entry.content_preview || 'Keyboard shortcut used';
-    case 'word_drop':    return entry.content_preview || 'Word count dropped significantly';
-    default:             return entry.content_preview || '';
+// ═══════════════════════════════════════════════════
+// RETURN TO STUDENT
+// Unlocks a submitted essay so the student can resume.
+// Student just refreshes and re-enters their name + assignment password.
+// ═══════════════════════════════════════════════════
+async function returnToStudent(submissionId, studentName) {
+  openModal(`
+    <div class="modal-header">
+      <h3>Return Essay to Student?</h3>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      This will unlock <strong>${esc(studentName)}'s</strong> essay so they can continue writing.
+      <br><br>
+      Tell the student to refresh the page and log in again with their name and the assignment password.
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-warning" onclick="closeModal(); doReturnToStudent('${submissionId}', '${esc(studentName)}')">
+        Yes, Return Essay
+      </button>
+    </div>
+  `);
+}
+
+async function doReturnToStudent(submissionId, studentName) {
+  try {
+    const { error } = await db
+      .from('submissions')
+      .update({ is_submitted: false, submitted_at: null })
+      .eq('id', submissionId);
+
+    if (error) throw error;
+
+    toast(`${studentName}'s essay returned — they can now resume writing`, 'success', 4000);
+
+    // Reload submissions to reflect the change
+    if (STATE.selectedAssignmentId) {
+      loadSubmissions(STATE.selectedAssignmentId);
+    }
+  } catch (err) {
+    toast('Failed to return essay: ' + err.message, 'error');
   }
 }
 
 // ═══════════════════════════════════════════════════
-// EXPORT TO TSV (Tab-Separated Values — paste into Google Sheets)
+// EXPORT TO TSV
 // ═══════════════════════════════════════════════════
 function exportTSV() {
   const subs = STATE.allSubmissions;
@@ -2024,7 +2012,6 @@ function exportTSV() {
       pastes.length,
       largePaste.length,
       idles.length,
-      // Strip HTML tags for clean export, replace newlines/tabs
       (s.essay_text || '').replace(/\t/g, ' ').replace(/\n/g, ' ↵ '),
     ].join('\t');
   });
@@ -2035,7 +2022,6 @@ function exportTSV() {
     navigator.clipboard.writeText(tsv);
     toast('Tab-separated data copied — paste into Google Sheets', 'success', 4000);
   } catch (e) {
-    // Fallback: create a download
     const blob = new Blob([tsv], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -2049,7 +2035,6 @@ function exportTSV() {
 // ═══════════════════════════════════════════════════
 // UTILITY HELPERS
 // ═══════════════════════════════════════════════════
-// Escape HTML for safe insertion
 function esc(s) {
   return String(s || '')
     .replace(/&/g, '&amp;')
@@ -2058,7 +2043,6 @@ function esc(s) {
     .replace(/"/g, '&quot;');
 }
 
-// Format an ISO timestamp to a readable local time
 function formatTime(iso) {
   if (!iso) return '—';
   try {
@@ -2069,12 +2053,26 @@ function formatTime(iso) {
   } catch { return iso; }
 }
 
-// Format elapsed seconds as mm:ss
 function formatElapsed(secs) {
   if (secs === undefined || secs === null) return '—';
   const m = Math.floor(secs / 60);
   const s = secs % 60;
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+function getLogDetail(entry) {
+  switch (entry.type) {
+    case 'paste':        return `${entry.char_count} chars pasted${entry.content_preview ? ': "' + entry.content_preview + '…"' : ''}`;
+    case 'burst':        return `${entry.char_count} chars typed in one burst`;
+    case 'idle':         return entry.content_preview || 'Idle period';
+    case 'delete_burst': return `${entry.char_count} chars deleted at once`;
+    case 'tab_hidden':   return entry.content_preview || 'Tab hidden';
+    case 'window_blur':  return entry.content_preview || 'Window lost focus';
+    case 'right_click':  return entry.content_preview || 'Right-click in essay area';
+    case 'shortcut':     return entry.content_preview || 'Keyboard shortcut used';
+    case 'word_drop':    return entry.content_preview || 'Word count dropped significantly';
+    default:             return entry.content_preview || '';
+  }
 }
 
 </script>
