@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>smith-teaches-tech — Writing Assessment</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📝</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 
@@ -122,8 +121,6 @@
     .btn-danger { background: var(--danger); color: #fff; border-color: var(--danger); }
     .btn-danger:hover { background: #a93226; }
     .btn-success { background: var(--success); color: #fff; border-color: var(--success); }
-    .btn-warning { background: var(--warning); color: #fff; border-color: var(--warning); }
-    .btn-warning:hover { background: #8a6600; }
     .btn-lg { padding: 0.85rem 1.75rem; font-size: 0.95rem; }
     .btn-block { width: 100%; }
     .btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
@@ -347,14 +344,6 @@
       cursor: not-allowed;
       color: var(--muted);
     }
-    /* Suppress underlines injected by browser extensions (LanguageTool, MS Editor, etc.)
-       Can't block all extensions but this kills most visual hints */
-    #essay-textarea {
-      text-decoration: none !important;
-      -webkit-text-decorations-in-effect: none !important;
-    }
-    #essay-textarea::spelling-error { text-decoration: none !important; }
-    #essay-textarea::grammar-error  { text-decoration: none !important; }
 
     /* Submit bar */
     .writing-footer {
@@ -602,97 +591,6 @@
     }
     .empty-panel { padding: 1.5rem; text-align: center; color: var(--muted); font-size: 0.85rem; }
 
-    /* ── Live status panel ─── */
-    .live-panel {
-      padding: 0.85rem 1rem;
-      background: var(--cream);
-      border-bottom: 1px solid var(--border);
-    }
-    .live-panel-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 0.6rem;
-    }
-    .live-panel-title {
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    .live-dot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: var(--success);
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0.3; }
-    }
-    .live-updated {
-      font-size: 0.7rem;
-      color: var(--muted);
-      font-family: 'DM Mono', monospace;
-    }
-    .live-columns {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
-    }
-    .live-col-label {
-      font-size: 0.68rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-bottom: 0.35rem;
-    }
-    .live-col-label.in-progress { color: var(--warning); }
-    .live-col-label.submitted   { color: var(--success); }
-    .live-names {
-      display: flex;
-      flex-direction: column;
-      gap: 0.2rem;
-      max-height: 130px;
-      overflow-y: auto;
-    }
-    .live-name-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 0.78rem;
-      padding: 0.2rem 0.4rem;
-      border-radius: 4px;
-      gap: 0.4rem;
-    }
-    .live-name-item.in-progress {
-      background: #fff8e6;
-      border-left: 2px solid var(--gold);
-    }
-    .live-name-item.submitted {
-      background: #eaf5ef;
-      border-left: 2px solid var(--success);
-    }
-    .live-name-text { flex: 1; color: var(--text); }
-    .live-name-time { font-size: 0.68rem; color: var(--muted); white-space: nowrap; }
-    .live-empty { font-size: 0.78rem; color: var(--muted); font-style: italic; padding: 0.2rem 0.4rem; }
-    .rename-btn {
-      background: none;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 0.1rem 0.35rem;
-      font-size: 0.65rem;
-      color: var(--muted);
-      cursor: pointer;
-      transition: all var(--t);
-      white-space: nowrap;
-    }
-    .rename-btn:hover { border-color: var(--navy); color: var(--navy); background: var(--cream); }
-
     /* ── Submissions panel ─── */
     .submissions-panel { }
     .sub-toolbar {
@@ -812,14 +710,12 @@
       flex-shrink: 0;
       user-select: none;
       position: sticky;
-      top: 52px;
+      top: 52px; /* sits flush below the sticky header */
       z-index: 99;
     }
 
     .log-entry.tab_hidden  { background: #fdecea; border-left: 3px solid #c0392b; }
-    .log-entry.tab_return  { background: #e8f4fd; border-left: 3px solid #2980b9; }
     .log-entry.window_blur { background: #fdecea; border-left: 3px solid #c0392b; }
-    .log-entry.window_return { background: #e8f4fd; border-left: 3px solid #2980b9; }
     .log-entry.right_click { background: #fff3e0; border-left: 3px solid #e67e22; }
     .log-entry.shortcut    { background: #fff3e0; border-left: 3px solid #e67e22; }
     .log-entry.word_drop   { background: #fdecea; border-left: 3px solid #c0392b; }
@@ -1001,17 +897,13 @@
   <div class="watermark-bar" id="watermark-bar">● smith-teaches-tech · assessment in progress ●</div>
 
   <div class="writing-main">
-    <!-- CHANGE 1: Added Grammarly-blocking attributes + updated placeholder text -->
     <textarea
       id="essay-textarea"
-      placeholder="Begin writing here. Your work is saved automatically every 15 seconds."
+      placeholder="Begin writing here. Your work is saved automatically every 30 seconds."
       spellcheck="false"
       autocorrect="off"
       autocapitalize="off"
       autocomplete="off"
-      data-gramm="false"
-      data-gramm_editor="false"
-      data-enable-grammarly="false"
     ></textarea>
   </div>
 
@@ -1036,8 +928,10 @@
       ✓ Your essay has been submitted and recorded. You cannot edit it further.
     </div>
 
+    <!-- Process summary shown after submission -->
     <div class="process-summary" id="process-summary"></div>
 
+    <!-- Essay read-only copy -->
     <div class="submitted-essay-wrap">
       <div class="submitted-toolbar">
         <span class="submitted-label">Your Submitted Essay</span>
@@ -1088,7 +982,7 @@
       </div>
       <div style="display:flex;gap:0.6rem;align-items:center">
         <button class="btn btn-secondary" style="font-size:0.78rem;padding:0.45rem 0.8rem" onclick="refreshDashboard()">↻ Refresh</button>
-        <button class="btn btn-secondary" style="font-size:0.78rem;padding:0.45rem 0.8rem" onclick="stopPolling(); showScreen('landing')">← Exit</button>
+        <button class="btn btn-secondary" style="font-size:0.78rem;padding:0.45rem 0.8rem" onclick="showScreen('landing')">← Exit</button>
       </div>
     </div>
   </header>
@@ -1136,26 +1030,6 @@
       <div class="panel-header">
         <h2 id="submissions-panel-title">Submissions</h2>
       </div>
-      <!-- Live status panel — auto-refreshes every 20s when an assignment is selected -->
-      <div class="live-panel" id="live-panel" style="display:none">
-        <div class="live-panel-header">
-          <div class="live-panel-title">
-            <div class="live-dot"></div>
-            Live Status
-          </div>
-          <span class="live-updated" id="live-updated">—</span>
-        </div>
-        <div class="live-columns">
-          <div>
-            <div class="live-col-label in-progress">✍ In Progress</div>
-            <div class="live-names" id="live-in-progress"></div>
-          </div>
-          <div>
-            <div class="live-col-label submitted">✓ Submitted</div>
-            <div class="live-names" id="live-submitted"></div>
-          </div>
-        </div>
-      </div>
       <div class="sub-toolbar">
         <span class="sub-count" id="sub-count">Select an assignment to view submissions.</span>
         <button class="btn btn-secondary" style="font-size:0.78rem;padding:0.45rem 0.8rem"
@@ -1188,7 +1062,9 @@
 // ═══════════════════════════════════════════════════
 const SUPABASE_URL     = 'https://opxejwarxyuqyafysqvk.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_A7iE6EknGVEEOTLZiof8xw_TjC2VdSK';
-const TEACHER_PASSWORD  = 'IhateAIcheaters';
+// SHA-256 hash of the teacher password — plaintext never stored here
+// To change password: run `echo -n "yourpassword" | sha256sum` and paste the result
+const TEACHER_PASSWORD_HASH = '8516b9dc9111fea791aa9253596c8064f0c1d95bf992ae525ca66d36b750305d';
 
 // ═══════════════════════════════════════════════════
 // SUPABASE CLIENT INIT
@@ -1198,36 +1074,36 @@ const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ═══════════════════════════════════════════════════
 // APP STATE
+// Holds all runtime info — kept simple and flat
 // ═══════════════════════════════════════════════════
 const STATE = {
-  submissionId: null,
-  assignmentId: null,
+  // Student session
+  submissionId: null,       // uuid of current submission row
+  assignmentId: null,       // uuid of active assignment
   assignmentTitle: null,
   timeLimitSeconds: 0,
   studentName: null,
   period: null,
-  startedAt: null,
-  timerInterval: null,
-  autosaveInterval: null,
-  processLog: [],
+  startedAt: null,          // ISO string from DB (when essay was first started)
+  timerInterval: null,      // setInterval handle for countdown
+  autosaveInterval: null,   // setInterval handle for autosave
+  processLog: [],           // array of log event objects (appended to during session)
   isSubmitted: false,
+
+  // Process log tracking vars
   lastInputTime: null,
   lastTextLength: 0,
-  lastWordCount: 0,
+  lastWordCount: 0,      // for word-drop detection in autosave
   pendingBurstChars: 0,
   burstCheckInterval: null,
   sessionStartTime: null,
-  _visibilityHandler: null,
-  _blurHandler: null,
-  _focusHandler: null,
-  tabLeftAt: null,          // timestamp when student left the tab
-  windowLeftAt: null,       // timestamp when student left the window
-  selectedAssignmentId: null,
-  allSubmissions: [],
-  expandedSubId: null,
-  pollInterval: null,       // auto-refresh interval for live panel
-  lastRefreshedAt: null,    // timestamp of last successful load
-  liveTickInterval: null,   // updates the "X seconds ago" ticker
+  _visibilityHandler: null,  // stored so we can remove on submit
+  _blurHandler: null,        // stored so we can remove on submit
+
+  // Teacher session
+  selectedAssignmentId: null,   // assignment being viewed in dashboard
+  allSubmissions: [],           // loaded submissions for selected assignment
+  expandedSubId: null,          // which submission row is expanded
 };
 
 // ═══════════════════════════════════════════════════
@@ -1279,6 +1155,9 @@ function countWords(text) {
 
 // ═══════════════════════════════════════════════════
 // ELAPSED SECONDS SINCE STARTED
+// Uses started_at (ISO string) stored in Supabase
+// NOTE: If student has the page open for days, timer will over-count.
+// For timed exams, this is intentional — clock runs on wall time.
 // ═══════════════════════════════════════════════════
 function elapsedSeconds() {
   if (!STATE.startedAt) return 0;
@@ -1308,6 +1187,7 @@ async function studentLogin() {
   btn.textContent = 'Checking…';
 
   try {
+    // 1. Find an active assignment matching the password
     const { data: assignments, error: aErr } = await db
       .from('assignments')
       .select('*')
@@ -1324,6 +1204,7 @@ async function studentLogin() {
 
     const assignment = assignments[0];
 
+    // 2. Check if a submission already exists for this student + assignment
     const { data: existing, error: sErr } = await db
       .from('submissions')
       .select('*')
@@ -1334,25 +1215,29 @@ async function studentLogin() {
     if (sErr) throw sErr;
 
     if (existing) {
+      // Resuming an existing session
       if (existing.is_submitted) {
+        // Already done — show the locked submitted screen
         loadSubmittedScreen(existing, assignment);
         showScreen('submitted');
         return;
       }
 
-      STATE.submissionId    = existing.id;
-      STATE.assignmentId    = assignment.id;
+      // Resume writing
+      STATE.submissionId   = existing.id;
+      STATE.assignmentId   = assignment.id;
       STATE.assignmentTitle = assignment.title;
       STATE.timeLimitSeconds = assignment.time_limit_minutes * 60;
-      STATE.studentName     = name;
-      STATE.period          = period;
-      STATE.startedAt       = existing.started_at;
-      STATE.processLog      = existing.process_log || [];
-      STATE.isSubmitted     = false;
+      STATE.studentName    = name;
+      STATE.period         = period;
+      STATE.startedAt      = existing.started_at;
+      STATE.processLog     = existing.process_log || [];
+      STATE.isSubmitted    = false;
 
       enterWritingMode(existing.essay_text || '');
 
     } else {
+      // Brand new submission
       const now = new Date().toISOString();
       const { data: newSub, error: nErr } = await db
         .from('submissions')
@@ -1371,15 +1256,15 @@ async function studentLogin() {
 
       if (nErr) throw nErr;
 
-      STATE.submissionId    = newSub.id;
-      STATE.assignmentId    = assignment.id;
+      STATE.submissionId   = newSub.id;
+      STATE.assignmentId   = assignment.id;
       STATE.assignmentTitle = assignment.title;
       STATE.timeLimitSeconds = assignment.time_limit_minutes * 60;
-      STATE.studentName     = name;
-      STATE.period          = period;
-      STATE.startedAt       = now;
-      STATE.processLog      = [];
-      STATE.isSubmitted     = false;
+      STATE.studentName    = name;
+      STATE.period         = period;
+      STATE.startedAt      = now;
+      STATE.processLog     = [];
+      STATE.isSubmitted    = false;
 
       enterWritingMode('');
     }
@@ -1396,12 +1281,15 @@ async function studentLogin() {
 
 // ═══════════════════════════════════════════════════
 // ENTER WRITING MODE
+// Sets up the writing screen, starts timer + autosave + logging
 // ═══════════════════════════════════════════════════
 function enterWritingMode(savedText) {
+  // Populate header
   document.getElementById('writing-title').textContent = STATE.assignmentTitle;
   document.getElementById('writing-student').textContent =
     `${STATE.studentName} · ${STATE.period}`;
 
+  // Set up textarea
   const editor = document.getElementById('essay-textarea');
   editor.value = savedText || '';
   editor.disabled = false;
@@ -1410,66 +1298,42 @@ function enterWritingMode(savedText) {
 
   showScreen('writing');
 
+  // Check if time already expired (resuming a timed-out session)
   const remaining = STATE.timeLimitSeconds - elapsedSeconds();
   if (remaining <= 0) {
     autoSubmit('Timer had already expired.');
     return;
   }
 
+  // Start the countdown timer
   startTimer();
 
-  // CHANGE 2: Autosave every 15 seconds (was 30)
-  STATE.autosaveInterval = setInterval(autosave, 15000);
+  // Start autosave every 30 seconds
+  STATE.autosaveInterval = setInterval(autosave, 30000);
 
+  // Start process event monitoring (checks every 3 seconds for idle/burst)
   STATE.burstCheckInterval = setInterval(checkBurstAndIdle, 3000);
 
+  // Attach process event listeners to the textarea
   attachProcessListeners(editor);
 
-  // ── Tab visibility — most reliable signal for "left this tab" ──
-  // Fires when student switches tabs, minimizes, or the screen locks
+  // ── Tab visibility (Page Visibility API) ──
   STATE._visibilityHandler = () => {
     if (document.hidden) {
-      STATE.tabLeftAt = Date.now();
-      logEvent('tab_hidden', { content_preview: 'Left tab (switched tabs or minimized)' });
-    } else {
-      if (STATE.tabLeftAt) {
-        const gapSeconds = Math.round((Date.now() - STATE.tabLeftAt) / 1000);
-        logEvent('tab_return', {
-          char_count: gapSeconds,
-          content_preview: `Returned after ${formatDuration(gapSeconds)}`,
-        });
-        STATE.tabLeftAt = null;
-      }
+      logEvent('tab_hidden', { content_preview: 'Student switched tabs or minimized browser' });
     }
   };
   document.addEventListener('visibilitychange', STATE._visibilityHandler);
 
-  // ── Window blur/focus — catches Alt+Tab to another app without changing tabs ──
-  // Deduplicates against tab_hidden: if a visibility change fired within 2 seconds,
-  // skip the blur log — it's the same event, not a separate app switch.
+  // ── Window blur ──
   STATE._blurHandler = () => {
-    const recentTabHidden = STATE.tabLeftAt && (Date.now() - STATE.tabLeftAt) < 2000;
-    if (!recentTabHidden) {
-      STATE.windowLeftAt = Date.now();
-      logEvent('window_blur', { content_preview: 'Switched to another application (Alt+Tab or similar)' });
-    }
-  };
-  STATE._focusHandler = () => {
-    if (STATE.windowLeftAt) {
-      const gapSeconds = Math.round((Date.now() - STATE.windowLeftAt) / 1000);
-      // Only log if it was a meaningful gap (>1 second) to filter notification blips
-      if (gapSeconds >= 1) {
-        logEvent('window_return', {
-          char_count: gapSeconds,
-          content_preview: `Returned from other application after ${formatDuration(gapSeconds)}`,
-        });
-      }
-      STATE.windowLeftAt = null;
+    if (!document.hidden) {
+      logEvent('window_blur', { content_preview: 'Student switched to another application' });
     }
   };
   window.addEventListener('blur', STATE._blurHandler);
-  window.addEventListener('focus', STATE._focusHandler);
 
+  // Focus the textarea
   setTimeout(() => {
     const ta = document.getElementById('essay-textarea');
     if (ta) ta.focus();
@@ -1480,9 +1344,10 @@ function enterWritingMode(savedText) {
 // TIMER
 // ═══════════════════════════════════════════════════
 function startTimer() {
+  // Clear any existing timer
   if (STATE.timerInterval) clearInterval(STATE.timerInterval);
 
-  updateTimerDisplay();
+  updateTimerDisplay(); // Render immediately
 
   STATE.timerInterval = setInterval(() => {
     const remaining = STATE.timeLimitSeconds - elapsedSeconds();
@@ -1508,9 +1373,10 @@ function updateTimerDisplay(remainingOverride) {
   const s = secs % 60;
   el.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 
+  // Color shifts as time runs low
   el.classList.remove('warning', 'danger');
-  if (secs <= 300) el.classList.add('danger');
-  else if (secs <= 600) el.classList.add('warning');
+  if (secs <= 300) el.classList.add('danger');       // under 5 min
+  else if (secs <= 600) el.classList.add('warning'); // under 10 min
 }
 
 // ═══════════════════════════════════════════════════
@@ -1533,6 +1399,7 @@ async function autosave() {
   const text = ta.value;
   const currentWordCount = countWords(text);
 
+  // WORD DROP: If essay loses 50+ words between saves, log it
   if (STATE.lastWordCount > 50 && (STATE.lastWordCount - currentWordCount) >= 50) {
     logEvent('word_drop', {
       char_count: STATE.lastWordCount - currentWordCount,
@@ -1566,9 +1433,12 @@ async function autosave() {
       indicator.className = 'autosave-indicator';
       indicator.textContent = 'Save failed — retrying…';
     }
+    // NOTE: If autosave fails repeatedly, student work could be lost.
+    // Consider adding a localStorage backup here for extra resilience.
   }
 }
 
+// Manual save (the "Save Now" button)
 async function manualSave() {
   await autosave();
   toast('Saved!', 'success', 1500);
@@ -1576,23 +1446,28 @@ async function manualSave() {
 
 // ═══════════════════════════════════════════════════
 // PROCESS LOGGING
+// Captures paste, idle, burst, and delete_burst events
 // ═══════════════════════════════════════════════════
 function attachProcessListeners(editor) {
 
+  // PASTE: Capture what was pasted using clipboardData
   editor.addEventListener('paste', (e) => {
     const pastedText = (e.clipboardData || window.clipboardData).getData('text') || '';
     if (pastedText.length === 0) return;
+
     logEvent('paste', {
       char_count:      pastedText.length,
       content_preview: pastedText.slice(0, 80),
     });
   });
 
+  // INPUT: Track char deltas for burst and delete detection
   editor.addEventListener('input', () => {
     const now = Date.now();
     const currentLength = editor.value.length;
     const delta = currentLength - STATE.lastTextLength;
 
+    // LARGE DELETE: lost 100+ chars in one input event
     if (delta <= -100) {
       logEvent('delete_burst', {
         char_count: Math.abs(delta),
@@ -1600,6 +1475,7 @@ function attachProcessListeners(editor) {
       });
     }
 
+    // Track burst chars (positive deltas only)
     if (delta > 0) {
       STATE.pendingBurstChars += delta;
     }
@@ -1609,12 +1485,14 @@ function attachProcessListeners(editor) {
     updateWordCountDisplay();
   });
 
+  // RIGHT-CLICK: Log any right-click attempt in the editor
   editor.addEventListener('contextmenu', (e) => {
     logEvent('right_click', { content_preview: 'Right-click menu opened in essay area' });
   });
 
+  // KEYBOARD SHORTCUTS: Catch Ctrl+A, Ctrl+Z (mass undo), Ctrl+V (backup catch)
   editor.addEventListener('keydown', (e) => {
-    if (!e.ctrlKey && !e.metaKey) return;
+    if (!e.ctrlKey && !e.metaKey) return; // Only care about Ctrl/Cmd combos
     const key = e.key.toLowerCase();
     const labels = { a: 'Ctrl+A (Select All)', z: 'Ctrl+Z (Undo)', v: 'Ctrl+V (Paste shortcut)', x: 'Ctrl+X (Cut)' };
     if (labels[key]) {
@@ -1623,9 +1501,11 @@ function attachProcessListeners(editor) {
   });
 }
 
+// Called every 3 seconds by burstCheckInterval
+// Evaluates whether a typing burst or idle gap should be logged
 let lastBurstFlushTime = Date.now();
 let lastActiveTime = Date.now();
-let idleLogged = false;
+let idleLogged = false; // Prevent duplicate idle events for one gap
 
 function checkBurstAndIdle() {
   if (STATE.isSubmitted) return;
@@ -1635,25 +1515,29 @@ function checkBurstAndIdle() {
     ? (now - STATE.lastInputTime) / 1000
     : Infinity;
 
+  // BURST: flush if student paused for >5 seconds AND typed 50+ chars
   if (secsSinceInput > 5 && STATE.pendingBurstChars >= 50) {
     logEvent('burst', { char_count: STATE.pendingBurstChars });
     STATE.pendingBurstChars = 0;
     lastBurstFlushTime = now;
   }
 
+  // IDLE: student hasn't typed in 2+ minutes
   if (secsSinceInput > 120 && !idleLogged && STATE.lastInputTime) {
     logEvent('idle', {
       char_count: 0,
       content_preview: `Gap of ~${Math.round(secsSinceInput / 60)} minute(s)`,
     });
-    idleLogged = true;
+    idleLogged = true; // Only log once per idle gap
   }
 
+  // Reset idle flag when student types again
   if (secsSinceInput < 30 && idleLogged) {
     idleLogged = false;
   }
 }
 
+// ── Helper: push an event to the process log ──
 function logEvent(type, extras = {}) {
   const entry = {
     type,
@@ -1663,7 +1547,7 @@ function logEvent(type, extras = {}) {
     content_preview: extras.content_preview || '',
   };
   STATE.processLog.push(entry);
-  console.log('[ProcessLog]', entry);
+  console.log('[ProcessLog]', entry); // visible in DevTools if needed
 }
 
 // ═══════════════════════════════════════════════════
@@ -1696,14 +1580,16 @@ async function submitEssay(isAutoSubmit = false) {
   if (STATE.isSubmitted) return;
   STATE.isSubmitted = true;
 
+  // Stop timer and autosave loops
   clearInterval(STATE.timerInterval);
   clearInterval(STATE.autosaveInterval);
   clearInterval(STATE.burstCheckInterval);
 
+  // Remove visibility/blur monitors so they don't fire after submission
   if (STATE._visibilityHandler) document.removeEventListener('visibilitychange', STATE._visibilityHandler);
   if (STATE._blurHandler) window.removeEventListener('blur', STATE._blurHandler);
-  if (STATE._focusHandler) window.removeEventListener('focus', STATE._focusHandler);
 
+  // Flush any remaining burst
   if (STATE.pendingBurstChars >= 50) {
     logEvent('burst', { char_count: STATE.pendingBurstChars });
     STATE.pendingBurstChars = 0;
@@ -1727,13 +1613,13 @@ async function submitEssay(isAutoSubmit = false) {
 
   } catch (err) {
     console.error('Submit failed:', err);
-    STATE.isSubmitted = false;
+    STATE.isSubmitted = false; // Allow retry
     toast('Submission failed. Please try again: ' + err.message, 'error', 8000);
   }
 }
 
 // ═══════════════════════════════════════════════════
-// SUBMITTED SCREEN
+// SUBMITTED SCREEN — show process summary + read-only essay
 // ═══════════════════════════════════════════════════
 function showSubmittedScreen(text) {
   renderProcessSummary(STATE.processLog);
@@ -1742,6 +1628,7 @@ function showSubmittedScreen(text) {
   copyToClipboard(true);
 }
 
+// Used when resuming an already-submitted session
 function loadSubmittedScreen(submission, assignment) {
   renderProcessSummary(submission.process_log || []);
   document.getElementById('submitted-essay').value = submission.essay_text || '';
@@ -1772,6 +1659,7 @@ async function copyToClipboard(silent = false) {
     await navigator.clipboard.writeText(ta.value);
     if (!silent) toast('Essay copied to clipboard!', 'success');
   } catch (e) {
+    // Fallback for browsers that block clipboard API
     ta.select();
     document.execCommand('copy');
     if (!silent) toast('Essay copied!', 'success');
@@ -1780,12 +1668,23 @@ async function copyToClipboard(silent = false) {
 
 // ═══════════════════════════════════════════════════
 // TEACHER LOGIN
+// Password is checked client-side (hardcoded above)
+// NOTE: This is appropriate for a school internal tool.
+// The teacher password gates the dashboard UI only —
+// Supabase RLS should be used if truly sensitive data is needed.
 // ═══════════════════════════════════════════════════
-function teacherLogin() {
+async function teacherLogin() {
   const pw = document.getElementById('t-password').value;
   const statusEl = document.getElementById('t-status');
 
-  if (pw === TEACHER_PASSWORD) {
+  // Hash what the teacher typed, then compare to stored hash
+  const encoder = new TextEncoder();
+  const data = encoder.encode(pw);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+  if (hashHex === TEACHER_PASSWORD_HASH) {
     statusEl.className = 'status-msg';
     document.getElementById('t-password').value = '';
     loadDashboard();
@@ -1797,7 +1696,7 @@ function teacherLogin() {
 }
 
 // ═══════════════════════════════════════════════════
-// TEACHER DASHBOARD
+// TEACHER DASHBOARD — Load and render
 // ═══════════════════════════════════════════════════
 async function loadDashboard() {
   try {
@@ -1809,6 +1708,7 @@ async function loadDashboard() {
     if (error) throw error;
     renderAssignmentList(data || []);
 
+    // If an assignment was previously selected, reload its submissions
     if (STATE.selectedAssignmentId) {
       loadSubmissions(STATE.selectedAssignmentId);
     }
@@ -1820,13 +1720,7 @@ async function loadDashboard() {
 
 function refreshDashboard() {
   loadDashboard();
-  if (STATE.selectedAssignmentId) loadSubmissions(STATE.selectedAssignmentId);
   toast('Dashboard refreshed', 'default', 1500);
-}
-
-function stopPolling() {
-  if (STATE.pollInterval) { clearInterval(STATE.pollInterval); STATE.pollInterval = null; }
-  if (STATE.liveTickInterval) { clearInterval(STATE.liveTickInterval); STATE.liveTickInterval = null; }
 }
 
 // ═══════════════════════════════════════════════════
@@ -1887,6 +1781,7 @@ async function createAssignment() {
     });
     if (error) throw error;
 
+    // Clear form
     document.getElementById('a-title').value    = '';
     document.getElementById('a-password').value = '';
     document.getElementById('a-time').value     = '';
@@ -1901,6 +1796,7 @@ async function createAssignment() {
 async function toggleActive(assignmentId, makeActive) {
   try {
     if (makeActive) {
+      // Deactivate all others first — only one assignment active at a time
       await db.from('assignments').update({ is_active: false }).neq('id', assignmentId);
     }
     await db.from('assignments').update({ is_active: makeActive }).eq('id', assignmentId);
@@ -1930,6 +1826,7 @@ async function deleteAssignment(id, title) {
 
 async function doDeleteAssignment(id) {
   try {
+    // Delete submissions first (foreign key constraint)
     await db.from('submissions').delete().eq('assignment_id', id);
     await db.from('assignments').delete().eq('id', id);
 
@@ -1953,55 +1850,15 @@ async function doDeleteAssignment(id) {
 // SUBMISSIONS VIEWER
 // ═══════════════════════════════════════════════════
 function selectAssignment(id) {
-  // Toggle off if already selected
-  if (STATE.selectedAssignmentId === id) {
-    STATE.selectedAssignmentId = null;
-    STATE.allSubmissions = [];
-    STATE.expandedSubId = null;
-    if (STATE.pollInterval) { clearInterval(STATE.pollInterval); STATE.pollInterval = null; }
-    if (STATE.liveTickInterval) { clearInterval(STATE.liveTickInterval); STATE.liveTickInterval = null; }
-    document.getElementById('live-panel').style.display = 'none';
-    document.getElementById('submissions-table-wrap').innerHTML =
-      '<div class="empty-panel" style="padding:3rem">Select an assignment on the left to view its submissions.</div>';
-    document.getElementById('sub-count').textContent = 'Select an assignment to view submissions.';
-    document.getElementById('export-btn').disabled = true;
-    loadDashboard();
-    return;
-  }
   STATE.selectedAssignmentId = id;
   STATE.expandedSubId = null;
-
-  // Show live panel
-  document.getElementById('live-panel').style.display = 'block';
-
-  // Stop any existing poll before starting a new one
-  if (STATE.pollInterval) clearInterval(STATE.pollInterval);
-  if (STATE.liveTickInterval) clearInterval(STATE.liveTickInterval);
-
-  // Load immediately, then auto-refresh every 20 seconds
   loadSubmissions(id);
-  STATE.pollInterval = setInterval(() => loadSubmissions(id), 20000);
-
-  // Tick the "X seconds ago" label every second
-  STATE.liveTickInterval = setInterval(updateLiveTicker, 1000);
-
   loadDashboard(); // Re-render list to show selection highlight
 }
 
-// Updates the "Last updated X seconds ago" ticker in the live panel
-function updateLiveTicker() {
-  const el = document.getElementById('live-updated');
-  if (!el || !STATE.lastRefreshedAt) return;
-  const secs = Math.floor((Date.now() - STATE.lastRefreshedAt) / 1000);
-  el.textContent = secs < 5 ? 'Just updated' : `Updated ${secs}s ago`;
-}
-
 async function loadSubmissions(assignmentId) {
-  // Don't wipe the table on background polls — only show loading on first load
-  if (!STATE.allSubmissions.length) {
-    document.getElementById('submissions-table-wrap').innerHTML =
-      '<div class="empty-panel" style="padding:2rem">Loading…</div>';
-  }
+  document.getElementById('submissions-table-wrap').innerHTML =
+    '<div class="empty-panel" style="padding:2rem">Loading…</div>';
 
   try {
     const { data, error } = await db
@@ -2013,9 +1870,6 @@ async function loadSubmissions(assignmentId) {
     if (error) throw error;
 
     STATE.allSubmissions = data || [];
-    STATE.lastRefreshedAt = Date.now();
-
-    renderLivePanel(data || []);
     renderSubmissionsTable(data || []);
 
     document.getElementById('export-btn').disabled = !data || data.length === 0;
@@ -2024,91 +1878,6 @@ async function loadSubmissions(assignmentId) {
     toast('Failed to load submissions: ' + err.message, 'error');
     document.getElementById('submissions-table-wrap').innerHTML =
       `<div class="empty-panel" style="padding:2rem;color:var(--danger)">Error: ${err.message}</div>`;
-  }
-}
-
-// ═══════════════════════════════════════════════════
-// LIVE STATUS PANEL
-// Shows who is in-progress vs submitted at a glance.
-// Rename button lets you fix a name typo without the student logging out.
-// ═══════════════════════════════════════════════════
-function renderLivePanel(submissions) {
-  const inProgress = submissions.filter(s => !s.is_submitted);
-  const submitted  = submissions.filter(s => s.is_submitted);
-
-  const ipEl = document.getElementById('live-in-progress');
-  const subEl = document.getElementById('live-submitted');
-  if (!ipEl || !subEl) return;
-
-  ipEl.innerHTML = inProgress.length
-    ? inProgress.map(s => `
-        <div class="live-name-item in-progress">
-          <span class="live-name-text">${esc(s.student_name)}</span>
-          <button class="rename-btn" onclick="renameStudent('${s.id}', '${esc(s.student_name)}')">Rename</button>
-        </div>
-      `).join('')
-    : '<div class="live-empty">No one writing yet</div>';
-
-  subEl.innerHTML = submitted.length
-    ? submitted.map(s => `
-        <div class="live-name-item submitted">
-          <span class="live-name-text">${esc(s.student_name)}</span>
-          <span class="live-name-time">${s.submitted_at ? formatTime(s.submitted_at) : ''}</span>
-        </div>
-      `).join('')
-    : '<div class="live-empty">No submissions yet</div>';
-}
-
-// Opens a modal to rename a student — corrects typos without disrupting their session.
-// The student's browser will pick up the corrected name on next autosave or page reload.
-function renameStudent(subId, currentName) {
-  openModal(`
-    <div class="modal-header">
-      <h3>Rename Student</h3>
-      <button class="modal-close" onclick="closeModal()">×</button>
-    </div>
-    <div class="modal-body">
-      Correct the name for this submission. The student does not need to do anything.
-      <div class="form-group" style="margin-top:0.85rem">
-        <label>Student Name</label>
-        <input class="form-input" id="rename-input" type="text" value="${esc(currentName)}"
-          onkeydown="if(event.key==='Enter') { closeModal(); doRenameStudent('${subId}', document.getElementById('rename-input').value.trim()); }">
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="
-        const newName = document.getElementById('rename-input').value.trim();
-        closeModal();
-        doRenameStudent('${subId}', newName);
-      ">Save Name</button>
-    </div>
-  `);
-  // Auto-select the text so teacher can type immediately
-  setTimeout(() => {
-    const inp = document.getElementById('rename-input');
-    if (inp) { inp.focus(); inp.select(); }
-  }, 100);
-}
-
-async function doRenameStudent(subId, newName) {
-  if (!newName) { toast('Name cannot be empty', 'warning'); return; }
-  try {
-    const { error } = await db
-      .from('submissions')
-      .update({ student_name: newName })
-      .eq('id', subId);
-
-    if (error) throw error;
-
-    toast(`Name updated to "${newName}"`, 'success');
-
-    // Reload to reflect the change everywhere
-    if (STATE.selectedAssignmentId) {
-      loadSubmissions(STATE.selectedAssignmentId);
-    }
-  } catch (err) {
-    toast('Rename failed: ' + err.message, 'error');
   }
 }
 
@@ -2129,7 +1898,8 @@ function renderSubmissionsTable(submissions) {
     const log = s.process_log || [];
     const pastes     = log.filter(e => e.type === 'paste');
     const idles      = log.filter(e => e.type === 'idle');
-    const tabHidden  = log.filter(e => e.type === 'tab_hidden' || e.type === 'window_blur');    const shortcuts  = log.filter(e => e.type === 'shortcut' || e.type === 'right_click');
+    const tabHidden  = log.filter(e => e.type === 'tab_hidden' || e.type === 'window_blur');
+    const shortcuts  = log.filter(e => e.type === 'shortcut' || e.type === 'right_click');
     const wordDrops  = log.filter(e => e.type === 'word_drop');
     const largePaste = pastes.some(e => e.char_count > 200);
 
@@ -2153,7 +1923,7 @@ function renderSubmissionsTable(submissions) {
             }</td>
         <td>${s.submitted_at ? formatTime(s.submitted_at) : '—'}</td>
         <td><div class="flag-cell">${flags || '—'}</div></td>
-        <td style="color:var(--muted);font-size:0.78rem">${pastes.length} paste · ${tabHidden.length} tab switch · ${idles.length} idle${longestTabGap(log) ? ' · longest away: ' + longestTabGap(log) : ''}</td>
+        <td style="color:var(--muted);font-size:0.78rem">${pastes.length} paste · ${tabHidden.length} tab switch · ${idles.length} idle</td>
       </tr>
       ${STATE.expandedSubId === s.id ? renderDetailRow(s) : ''}
     `;
@@ -2182,9 +1952,6 @@ function toggleSubmissionDetail(subId) {
   renderSubmissionsTable(STATE.allSubmissions);
 }
 
-// CHANGE 3: Added "Return to Student" button in the detail row
-// This flips is_submitted back to false so the student can resume writing.
-// The student just refreshes and re-enters their name and password.
 function renderDetailRow(sub) {
   const log = sub.process_log || [];
   const logHtml = log.length
@@ -2210,21 +1977,12 @@ function renderDetailRow(sub) {
               ${sub.word_count || 0} words · Started ${formatTime(sub.started_at)}
             </span>
           </div>
-          <div style="display:flex;gap:0.5rem;align-items:center">
-            <div class="detail-flags">
-              ${(sub.process_log||[]).some(e=>e.type==='paste')             ? '🚩 Paste' : ''}
-              ${(sub.process_log||[]).some(e=>e.char_count>200&&e.type==='paste') ? '⚠️ Large paste' : ''}
-              ${(sub.process_log||[]).some(e=>e.type==='tab_hidden'||e.type==='window_blur') ? '👁 Tab switch' : ''}
-              ${(sub.process_log||[]).some(e=>e.type==='word_drop')         ? '📉 Word drop' : ''}
-              ${(sub.process_log||[]).some(e=>e.type==='idle')              ? '🕐 Idle gap' : ''}
-            </div>
-            ${sub.is_submitted
-              ? `<button class="btn btn-warning" style="font-size:0.72rem;padding:0.3rem 0.7rem"
-                   onclick="event.stopPropagation(); returnToStudent('${sub.id}', '${esc(sub.student_name)}')">
-                   ↩ Return to Student
-                 </button>`
-              : ''
-            }
+          <div class="detail-flags">
+            ${(sub.process_log||[]).some(e=>e.type==='paste')             ? '🚩 Paste' : ''}
+            ${(sub.process_log||[]).some(e=>e.char_count>200&&e.type==='paste') ? '⚠️ Large paste' : ''}
+            ${(sub.process_log||[]).some(e=>e.type==='tab_hidden'||e.type==='window_blur') ? '👁 Tab switch' : ''}
+            ${(sub.process_log||[]).some(e=>e.type==='word_drop')         ? '📉 Word drop' : ''}
+            ${(sub.process_log||[]).some(e=>e.type==='idle')              ? '🕐 Idle gap' : ''}
           </div>
         </div>
         <div class="detail-essay">${esc(sub.essay_text || '(no essay text)')}</div>
@@ -2235,53 +1993,23 @@ function renderDetailRow(sub) {
   `;
 }
 
-// ═══════════════════════════════════════════════════
-// RETURN TO STUDENT
-// Unlocks a submitted essay so the student can resume.
-// Student just refreshes and re-enters their name + assignment password.
-// ═══════════════════════════════════════════════════
-async function returnToStudent(submissionId, studentName) {
-  openModal(`
-    <div class="modal-header">
-      <h3>Return Essay to Student?</h3>
-      <button class="modal-close" onclick="closeModal()">×</button>
-    </div>
-    <div class="modal-body">
-      This will unlock <strong>${esc(studentName)}'s</strong> essay so they can continue writing.
-      <br><br>
-      Tell the student to refresh the page and log in again with their name and the assignment password.
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-warning" onclick="closeModal(); doReturnToStudent('${submissionId}', '${esc(studentName)}')">
-        Yes, Return Essay
-      </button>
-    </div>
-  `);
-}
-
-async function doReturnToStudent(submissionId, studentName) {
-  try {
-    const { error } = await db
-      .from('submissions')
-      .update({ is_submitted: false, submitted_at: null })
-      .eq('id', submissionId);
-
-    if (error) throw error;
-
-    toast(`${studentName}'s essay returned — they can now resume writing`, 'success', 4000);
-
-    // Reload submissions to reflect the change
-    if (STATE.selectedAssignmentId) {
-      loadSubmissions(STATE.selectedAssignmentId);
-    }
-  } catch (err) {
-    toast('Failed to return essay: ' + err.message, 'error');
+function getLogDetail(entry) {
+  switch (entry.type) {
+    case 'paste':        return `${entry.char_count} chars pasted${entry.content_preview ? ': "' + entry.content_preview + '…"' : ''}`;
+    case 'burst':        return `${entry.char_count} chars typed in one burst`;
+    case 'idle':         return entry.content_preview || 'Idle period';
+    case 'delete_burst': return `${entry.char_count} chars deleted at once`;
+    case 'tab_hidden':   return entry.content_preview || 'Tab hidden';
+    case 'window_blur':  return entry.content_preview || 'Window lost focus';
+    case 'right_click':  return entry.content_preview || 'Right-click in essay area';
+    case 'shortcut':     return entry.content_preview || 'Keyboard shortcut used';
+    case 'word_drop':    return entry.content_preview || 'Word count dropped significantly';
+    default:             return entry.content_preview || '';
   }
 }
 
 // ═══════════════════════════════════════════════════
-// EXPORT TO TSV
+// EXPORT TO TSV (Tab-Separated Values — paste into Google Sheets)
 // ═══════════════════════════════════════════════════
 function exportTSV() {
   const subs = STATE.allSubmissions;
@@ -2305,6 +2033,7 @@ function exportTSV() {
       pastes.length,
       largePaste.length,
       idles.length,
+      // Strip HTML tags for clean export, replace newlines/tabs
       (s.essay_text || '').replace(/\t/g, ' ').replace(/\n/g, ' ↵ '),
     ].join('\t');
   });
@@ -2315,6 +2044,7 @@ function exportTSV() {
     navigator.clipboard.writeText(tsv);
     toast('Tab-separated data copied — paste into Google Sheets', 'success', 4000);
   } catch (e) {
+    // Fallback: create a download
     const blob = new Blob([tsv], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -2328,6 +2058,7 @@ function exportTSV() {
 // ═══════════════════════════════════════════════════
 // UTILITY HELPERS
 // ═══════════════════════════════════════════════════
+// Escape HTML for safe insertion
 function esc(s) {
   return String(s || '')
     .replace(/&/g, '&amp;')
@@ -2336,6 +2067,7 @@ function esc(s) {
     .replace(/"/g, '&quot;');
 }
 
+// Format an ISO timestamp to a readable local time
 function formatTime(iso) {
   if (!iso) return '—';
   try {
@@ -2346,47 +2078,12 @@ function formatTime(iso) {
   } catch { return iso; }
 }
 
+// Format elapsed seconds as mm:ss
 function formatElapsed(secs) {
   if (secs === undefined || secs === null) return '—';
   const m = Math.floor(secs / 60);
   const s = secs % 60;
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-}
-
-// Human-readable duration from seconds: "4m 12s", "45s", "1h 2m"
-function formatDuration(secs) {
-  if (secs < 60) return `${secs}s`;
-  const m = Math.floor(secs / 60);
-  const s = secs % 60;
-  if (m < 60) return s > 0 ? `${m}m ${s}s` : `${m}m`;
-  const h = Math.floor(m / 60);
-  const rm = m % 60;
-  return rm > 0 ? `${h}h ${rm}m` : `${h}h`;
-}
-
-// Returns formatted duration of the longest tab/window absence in a process log
-function longestTabGap(log) {
-  const returnEvents = log.filter(e => e.type === 'tab_return' || e.type === 'window_return');
-  if (!returnEvents.length) return null;
-  const max = Math.max(...returnEvents.map(e => e.char_count || 0));
-  return max > 0 ? formatDuration(max) : null;
-}
-
-function getLogDetail(entry) {
-  switch (entry.type) {
-    case 'paste':         return `${entry.char_count} chars pasted${entry.content_preview ? ': "' + entry.content_preview + '…"' : ''}`;
-    case 'burst':         return `${entry.char_count} chars typed in one burst`;
-    case 'idle':          return entry.content_preview || 'Idle period';
-    case 'delete_burst':  return `${entry.char_count} chars deleted at once`;
-    case 'tab_hidden':    return entry.content_preview || 'Tab hidden';
-    case 'tab_return':    return entry.content_preview || `Returned to tab`;
-    case 'window_blur':   return entry.content_preview || 'Window lost focus';
-    case 'window_return': return entry.content_preview || 'Returned to window';
-    case 'right_click':   return entry.content_preview || 'Right-click in essay area';
-    case 'shortcut':      return entry.content_preview || 'Keyboard shortcut used';
-    case 'word_drop':     return entry.content_preview || 'Word count dropped significantly';
-    default:              return entry.content_preview || '';
-  }
 }
 
 </script>
