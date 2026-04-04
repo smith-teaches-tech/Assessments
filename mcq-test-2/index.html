@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AP English Language — Practice Exam #2</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap');
+
+  :root {
+    --cream: #f5f0e8;
+    --dark: #1a1a1a;
+    --mid: #444;
+    --muted: #888;
+    --border: #ccc;
+    --highlight: #f5e642;
+    --highlight-bg: rgba(245, 230, 66, 0.35);
+    --accent: #b5382a;
+    --accent-light: rgba(181, 56, 42, 0.1);
+    --green: #2a7a4b;
+    --green-light: rgba(42, 122, 75, 0.1);
+    --blue: #1a4a8a;
+    --blue-light: rgba(26, 74, 138, 0.1);
+    --warn: #e07b1a;
+    --warn-light: rgba(224, 123, 26, 0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'EB Garamond', Georgia, serif;
+    background: var(--cream);
+    color: var(--dark);
+    min-height: 100vh;
+    font-size: 17px;
+    line-height: 1.6;
+  }
+
+  /* ─── ENTRY SCREEN ─── */
+  #entry-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 40px 20px;
+    text-align: center;
+  }
+
+  .entry-logo {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 32px;
+  }
+
+  .entry-title {
+    font-size: 2.4rem;
+    font-weight: 500;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    max-width: 560px;
+  }
+
+  .entry-subtitle {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 14px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    margin-bottom: 40px;
+  }
+
+  .entry-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 36px 40px;
+    max-width: 480px;
+    width: 100%;
+    text-align: left;
+  }
+
+  .entry-card label {
+    display: block;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--mid);
+    margin-bottom: 8px;
+  }
+
+  .entry-card input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 15px;
+    background: var(--cream);
+    color: var(--dark);
+    margin-bottom: 20px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .entry-card input:focus { border-color: var(--dark); }
+
+  .honor-box {
+    background: var(--warn-light);
+    border: 1px solid var(--warn);
+    border-radius: 3px;
+    padding: 14px 16px;
+    margin-bottom: 24px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--mid);
+  }
+
+  .honor-box strong { color: var(--dark); }
+
+  .btn-start {
+    width: 100%;
+    padding: 14px;
+    background: var(--dark);
+    color: white;
+    border: none;
+    border-radius: 3px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-start:hover { background: var(--accent); }
+
+  /* ─── CAMERA SETUP ─── */
+  #camera-screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 40px 20px;
+    text-align: center;
+  }
+
+  #camera-screen h2 {
+    font-size: 1.8rem;
+    margin-bottom: 12px;
+  }
+
+  #camera-screen p {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 14px;
+    color: var(--mid);
+    max-width: 400px;
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+
+  #preview-video {
+    width: 280px;
+    height: 200px;
+    background: #111;
+    border-radius: 4px;
+    border: 2px solid var(--border);
+    object-fit: cover;
+    margin-bottom: 24px;
+  }
+
+  .camera-btn {
+    padding: 12px 32px;
+    background: var(--dark);
+    color: white;
+    border: none;
+    border-radius: 3px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin: 6px;
+    transition: background 0.2s;
+  }
+
+  .camera-btn:hover { background: var(--accent); }
+  .camera-btn.secondary { background: var(--mid); }
+
+  /* ─── MAIN EXAM UI ─── */
+  #exam-screen {
+    display: none;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Top bar */
+  #top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background: var(--dark);
+    color: white;
+    flex-shrink: 0;
+    gap: 16px;
+  }
+
+  #top-bar .tb-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #999;
+  }
+
+  #top-bar .tb-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    color: white;
+  }
+
+  #timer {
+    font-family: 'DM Mono', monospace;
+    font-size: 22px;
+    font-weight: 500;
+    color: white;
+    min-width: 72px;
+    text-align: center;
+  }
+
+  #timer.warn { color: #ffb347; }
+  #timer.urgent { color: #ff6b6b; animation: pulse 1s infinite; }
+
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+  .tb-section { display: flex; flex-direction: column; }
+  .tb-mid { flex: 1; display: flex; justify-content: center; align-items: center; }
+
+  /* Flag bar */
+  #flag-bar {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px;
+    background: var(--accent);
+    color: white;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+    animation: slideDown 0.3s ease;
+  }
+
+  @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+
+  /* Main content area */
+  #content-area {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ─── PASSAGE PANEL ─── */
+  #passage-panel {
+    width: 50%;
+    border-right: 2px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  #passage-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    background: #f0ebe0;
+    flex-shrink: 0;
+    overflow-x: auto;
+  }
+
+  .ptab {
+    padding: 10px 16px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-right: 1px solid var(--border);
+    white-space: nowrap;
+    color: var(--muted);
+    transition: all 0.15s;
+    border-bottom: 3px solid transparent;
+  }
+
+  .ptab:hover { color: var(--dark); background: #e8e3d8; }
+  .ptab.active { color: var(--dark); background: white; border-bottom: 3px solid var(--dark); }
+  .ptab.current-passage { color: var(--blue); }
+
+  #passage-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 28px 32px;
+    position: relative;
+  }
+
+  .passage-source {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .passage-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Paragraph-based passages */
+  .par-block {
+    margin-bottom: 16px;
+    position: relative;
+    padding-left: 36px;
+    transition: background 0.2s;
+    border-radius: 3px;
+  }
+
+  .par-num {
+    position: absolute;
+    left: 0;
+    top: 2px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    width: 28px;
+    text-align: right;
+  }
+
+  .par-block.highlighted {
+    background: var(--highlight-bg);
+  }
+
+  /* Sentence-based passages */
+  .sent-span {
+    transition: background 0.2s;
+    border-radius: 2px;
+    padding: 1px 0;
+  }
+
+  .sent-span.highlighted {
+    background: var(--highlight-bg);
+    box-shadow: 0 0 0 2px rgba(245, 230, 66, 0.5);
+  }
+
+  /* ─── QUESTION PANEL ─── */
+  #question-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #q-nav-bar {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    background: white;
+    gap: 8px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+
+  .q-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    cursor: pointer;
+    border: 1.5px solid var(--border);
+    color: var(--muted);
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+
+  .q-dot:hover { border-color: var(--dark); color: var(--dark); }
+  .q-dot.answered { background: var(--dark); color: white; border-color: var(--dark); }
+  .q-dot.current { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 0 2px var(--accent-light); }
+  .q-dot.answered.current { background: var(--accent); border-color: var(--accent); color: white; }
+
+  .q-sep {
+    width: 1px;
+    height: 20px;
+    background: var(--border);
+    flex-shrink: 0;
+  }
+
+  #q-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 28px;
+  }
+
+  .q-header {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .q-text {
+    font-size: 1.05rem;
+    line-height: 1.65;
+    margin-bottom: 22px;
+    color: var(--dark);
+  }
+
+  .q-text em {
+    font-style: italic;
+  }
+
+  .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .choice {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: white;
+  }
+
+  .choice:hover { border-color: var(--dark); background: var(--cream); }
+
+  .choice.selected {
+    border-color: var(--dark);
+    background: #f0ebe0;
+  }
+
+  .choice-letter {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    width: 20px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: var(--mid);
+  }
+
+  .choice-text {
+    font-size: 0.97rem;
+    line-height: 1.5;
+    color: var(--dark);
+  }
+
+  .choice.selected .choice-letter { color: var(--dark); font-weight: 700; }
+
+  /* Q nav buttons */
+  #q-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 28px;
+    border-top: 1px solid var(--border);
+    background: white;
+    flex-shrink: 0;
+  }
+
+  .btn-nav {
+    padding: 10px 22px;
+    border: 1.5px solid var(--dark);
+    border-radius: 3px;
+    background: white;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--dark);
+  }
+
+  .btn-nav:hover { background: var(--dark); color: white; }
+  .btn-nav:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .btn-submit-exam {
+    padding: 10px 22px;
+    border: none;
+    border-radius: 3px;
+    background: var(--accent);
+    color: white;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .btn-submit-exam:hover { background: #8b2a1f; }
+
+  /* Webcam corner */
+  #webcam-corner {
+    position: fixed;
+    bottom: 70px;
+    right: 20px;
+    width: 140px;
+    height: 100px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 2px solid rgba(255,255,255,0.3);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    z-index: 100;
+    background: #111;
+  }
+
+  #webcam-corner video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+  }
+
+  #webcam-label {
+    position: absolute;
+    bottom: 4px;
+    left: 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.1em;
+  }
+
+  /* ─── RESULTS SCREEN ─── */
+  #results-screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px 20px;
+    min-height: 100vh;
+    background: var(--cream);
+  }
+
+  .results-header {
+    font-size: 2rem;
+    font-weight: 500;
+    margin-bottom: 6px;
+    text-align: center;
+  }
+
+  .results-sub {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 40px;
+    text-align: center;
+  }
+
+  .score-big {
+    font-size: 5rem;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--dark);
+    text-align: center;
+    margin-bottom: 4px;
+  }
+
+  .score-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    max-width: 700px;
+    width: 100%;
+    margin-bottom: 36px;
+  }
+
+  .result-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .result-card .rc-val {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .result-card .rc-label {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .integrity-section {
+    max-width: 700px;
+    width: 100%;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+
+  .integrity-section h3 {
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--mid);
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .flag-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0ebe0;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 13px;
+    color: var(--mid);
+  }
+
+  .flag-item:last-child { border-bottom: none; }
+  .flag-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); margin-top: 4px; flex-shrink: 0; }
+  .flag-dot.ok { background: var(--green); }
+
+  .q-review-table {
+    max-width: 700px;
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 13px;
+    margin-bottom: 24px;
+  }
+
+  .q-review-table th {
+    text-align: left;
+    padding: 8px 12px;
+    background: var(--dark);
+    color: white;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+
+  .q-review-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--mid);
+  }
+
+  .q-review-table tr:nth-child(even) td { background: #f8f4ee; }
+  .q-review-table .correct { color: var(--green); font-weight: 700; }
+  .q-review-table .incorrect { color: var(--accent); font-weight: 700; }
+
+  .btn-download {
+    padding: 12px 28px;
+    background: var(--dark);
+    color: white;
+    border: none;
+    border-radius: 3px;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: background 0.2s;
+    margin: 6px;
+  }
+
+  .btn-download:hover { background: var(--accent); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════ ENTRY SCREEN ══════════════ -->
+<div id="entry-screen">
+  <div class="entry-logo">ASD · AP English Language</div>
+  <h1 class="entry-title">Practice Exam #2<br>Multiple Choice Section</h1>
+  <p class="entry-subtitle">45 Questions · 60 Minutes · Section I</p>
+
+  <div class="entry-card">
+    <label for="student-name">Full Name</label>
+    <input type="text" id="student-name" placeholder="First Last" autocomplete="name">
+
+    <label for="student-id">Student ID / Period</label>
+    <input type="text" id="student-id" placeholder="e.g. 2024-0042 · Period 3">
+
+    <div class="honor-box">
+      <strong>Academic Integrity Statement</strong><br>
+      By starting this exam, I confirm that I will complete it independently, without assistance from other people, AI tools, or unauthorized resources. I understand that tab switches and activity are logged.
+    </div>
+
+    <button class="btn-start" onclick="startEntry()">Begin Exam Setup →</button>
+  </div>
+</div>
+
+<!-- ══════════════ CAMERA SCREEN ══════════════ -->
+<div id="camera-screen">
+  <div class="entry-logo">Step 2 of 2 — Camera Setup</div>
+  <h2>Enable Your Camera</h2>
+  <p>Your camera will remain on during the exam. A small preview will appear in the corner. Click "Allow" when your browser asks for permission.</p>
+  <video id="preview-video" autoplay muted playsinline></video>
+  <div>
+    <button class="camera-btn" onclick="startExam()">Camera Ready — Start Exam →</button>
+    <button class="camera-btn secondary" onclick="skipCamera()">Skip Camera (Proceed Without)</button>
+  </div>
+</div>
+
+<!-- ══════════════ EXAM SCREEN ══════════════ -->
+<div id="exam-screen">
+
+  <!-- Top bar -->
+  <div id="top-bar">
+    <div class="tb-section">
+      <span class="tb-label">Student</span>
+      <span class="tb-val" id="tb-student">—</span>
+    </div>
+    <div class="tb-mid">
+      <div id="timer">60:00</div>
+    </div>
+    <div class="tb-section" style="align-items:flex-end">
+      <span class="tb-label">Tab Switches</span>
+      <span class="tb-val" id="tb-switches" style="text-align:right">0</span>
+    </div>
+  </div>
+
+  <!-- Flag bar (shown on tab switch) -->
+  <div id="flag-bar">
+    ⚠ Tab switch detected and logged. Please return to this exam.
+  </div>
+
+  <!-- Main -->
+  <div id="content-area">
+
+    <!-- Passage panel -->
+    <div id="passage-panel">
+      <div id="passage-tabs">
+        <div class="ptab active" data-p="0" onclick="showPassage(0)">Passage 1</div>
+        <div class="ptab" data-p="1" onclick="showPassage(1)">Passage 2</div>
+        <div class="ptab" data-p="2" onclick="showPassage(2)">Passage 3</div>
+        <div class="ptab" data-p="3" onclick="showPassage(3)">Passage 4</div>
+        <div class="ptab" data-p="4" onclick="showPassage(4)">Passage 5</div>
+      </div>
+      <div id="passage-content"></div>
+    </div>
+
+    <!-- Question panel -->
+    <div id="question-panel">
+      <div id="q-nav-bar" title="Click any number to jump to that question"></div>
+      <div id="q-content"></div>
+      <div id="q-footer">
+        <button class="btn-nav" id="btn-prev" onclick="prevQ()">← Previous</button>
+        <button class="btn-submit-exam" onclick="confirmSubmit()">Submit Exam</button>
+        <button class="btn-nav" id="btn-next" onclick="nextQ()">Next →</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Webcam corner -->
+  <div id="webcam-corner" style="display:none">
+    <video id="webcam-video" autoplay muted playsinline></video>
+    <span id="webcam-label">● REC</span>
+  </div>
+
+</div>
+
+<!-- ══════════════ RESULTS SCREEN ══════════════ -->
+<div id="results-screen">
+  <div class="results-header">Exam Complete</div>
+  <div class="results-sub" id="res-student-name">—</div>
+  <div class="score-big" id="score-num">—</div>
+  <div class="score-label">out of 45</div>
+
+  <div class="results-grid" id="results-grid"></div>
+
+  <div class="integrity-section">
+    <h3>Integrity Log</h3>
+    <div id="integrity-log"></div>
+  </div>
+
+  <table class="q-review-table" id="q-review-table">
+    <thead>
+      <tr>
+        <th>Q#</th>
+        <th>Passage</th>
+        <th>Your Answer</th>
+        <th>Correct</th>
+        <th>Result</th>
+      </tr>
+    </thead>
+    <tbody id="review-tbody"></tbody>
+  </table>
+
+  <div>
+    <button class="btn-download" onclick="downloadCSV()">Download CSV Report</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// CONFIG — paste your Apps Script Web App URL here
+// ═══════════════════════════════════════════════════════════
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwTxcxKPcboviSpzvqm2TEx94vI27hVZWy0RSw7KKcCDQBKUVcWMh_TN_z8FlInF43l9g/exec';
+
+// ═══════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════
+
+const ANSWER_KEY = {
+  1:'C',2:'D',3:'B',4:'A',5:'D',6:'D',7:'B',8:'A',9:'C',10:'B',
+  11:'D',12:'D',13:'D',14:'A',15:'A',16:'A',17:'D',18:'C',19:'D',20:'B',
+  21:'D',22:'C',23:'A',24:'B',25:'C',26:'A',27:'C',28:'B',29:'D',30:'A',
+  31:'C',32:'C',33:'B',34:'D',35:'B',36:'A',37:'D',38:'A',39:'D',40:'C',
+  41:'C',42:'A',43:'C',44:'B',45:'A'
+};
+
+const PASSAGES = [
+  {
+    id: 0,
+    title: 'Passage 1 — Octavia E. Butler, "Furor Scribendi" (excerpt)',
+    source: 'Questions 1–12',
+    type: 'paragraph',
+    pars: [
+      `Take classes and go to writers' workshops. Writing is communication. You need other people to let you know whether you're communicating what you think you are and whether you're doing it in ways that are not only accessible and entertaining, but as compelling as you can make them. In other words, you need to know that you're telling a good story. You want to be the writer who keeps readers up late at night, not the one who drives them off to watch television. Workshops and classes are rented readers—rented audiences—for your work. Learn from the comments, questions, and suggestions of both the teacher and the class. These relative strangers are more likely to tell you the truth about your work than are your friends and family who may not want to hurt or offend you. One tiresome truth they might tell you, for instance, is that you need to take a grammar class. If they say this, listen. Take the class. Vocabulary and grammar are your primary tools. They're most effectively used, even most effectively abused, by people who understand them. No computer program, no friend or employee can take the place of a sound knowledge of your tools.`,
+      `Write. Write every day. Write whether you feel like writing or not. Choose a time of day. Perhaps you can get up an hour earlier, stay up an hour later, give up an hour of recreation, or even give up your lunch hour. If you can't think of anything in your chosen genre, keep a journal. You should be keeping one anyway. Journal writing helps you to be more observant of your world, and a journal is a good place to store story ideas for later projects.`,
+      `Revise your writing until it's as good as you can make it. All the reading, the writing, and the classes should help you do this. Check your writing, your research (never neglect your research), and the physical appearance of your manuscript. Let nothing substandard slip through. If you notice something that needs fixing, fix it, no excuses. There will be plenty that's wrong that you won't catch. Don't make the mistake of ignoring flaws that are obvious to you. The moment you find yourself saying, "This doesn't matter. It's good enough." Stop. Go back. Fix the flaw. Make a habit of doing your best.`,
+      `Submit your work for publication. First research the markets that interest you. Seek out and study the books or magazines of publishers to whom you want to sell. Then submit your work. If the idea of doing this scares you, fine. Go ahead and be afraid. But send your work out anyway. If it's rejected, send it out again, and again. Rejections are painful, but inevitable. They're every writer's rite of passage. Don't give up on a piece of work that you can't sell. You may be able to sell it later to new publications or to new editors of old publications. At worst, you should be able to learn from your rejected work. You may even be able to use all or part of it in a new work. One way or another, writers can use, or at least learn from, everything.`,
+      `Here are some potential impediments for you to forget about:`,
+      `First forget inspiration. Habit is more dependable. Habit will sustain you whether you're inspired or not. Habit will help you finish and polish your stories. Inspiration won't. Habit is persistence in practice.`,
+      `Forget talent. If you have it, fine. Use it. If you don't have it, it doesn't matter. As habit is more dependable than inspiration, continued learning is more dependable than talent. Never let pride or laziness prevent you from learning, improving your work, changing its direction when necessary. Persistence is essential to any writer—the persistence to finish your work, to keep writing in spite of rejection, to keep reading, studying, submitting work for sale. But stubbornness, the refusal to change unproductive behavior or to revise unsalable work can be lethal to your writing hopes.`,
+      `Finally, don't worry about imagination. You have all the imagination you need, and all the reading, journal writing, and learning you will be doing will stimulate it. Play with your ideas. Have fun with them. Don't worry about being silly or outrageous or wrong. So much of writing is fun. It's first letting your interests and your imagination take you anywhere at all. Once you're able to do that, you'll have more ideas than you can use.`
+    ]
+  },
+  {
+    id: 1,
+    title: 'Passage 2 — Geography Professor, Preface (2008 excerpt)',
+    source: 'Questions 13–24',
+    type: 'paragraph',
+    pars: [
+      `Numerous books and articles published in recent years argue, explicitly as well as implicitly, that the human world today is so mobile, so interconnected, and so integrative that it is, in one prominent and much-repeated assessment, "flat." Ancient and durable obstacles are no more, interaction is global, free trade rules the globe, migration is ubiquitous, and the flow of ideas (and money and jobs) is so pervasive that geography, in the perspective of more than one observer, "is history." The notion that place continues to play a key role in shaping humanity's still-variegated mosaic is seen as obsolete, even offensive and deterministic. Choice, not constraint, is the mantra of the new flat-world proponents. Join the "forces of flattening" and you will enjoy the benefits. Don't, and you will fall off the edge. The option is yours.`,
+      `But is it? From the vantage point of a high-floor room in the Shanghai Hyatt, the Mumbai Oberoi, or the Dubai Hilton, or from a business-class window seat on Singapore Airlines, the world seems flat indeed. Millions of world-flatteners move every day from hotel lobby to airport limo to first-class lounge, laptop in hand, uploading, outsourcing, offshoring as they travel, adjusting the air conditioning as they go. They are changing the world, these modern nomads, and they are, in many ways, improving it—depending of course on one's definition of progress. But are they invariably agents of access and integration? Are they lowering the barriers to participation or raising the stakes against it? Have their influence and impact overpowered the imperatives of place, so that their very mobility symbolizes a confirmed irrelevance of location?`,
+      `Not yet. The Earth, physically as well as culturally, still is very rough terrain, and in crucial ways its regional compartments continue to trap billions in circumstances that spell disadvantage. The power of place and the fate of people are linked by many strands ranging from physical area and natural environment to durable culture and local tradition. This book, therefore, views a world in which progress toward convergence is countered by stagnation, even setbacks. Various constituencies of the comparatively prosperous global core are walling off their affluent realms from intrusion by poorer globals, hardening a division between core and periphery that exacerbates contrasts and stokes conflicts. The near-global diffusion of various forms of English as a first or second language is promoting a cultural convergence, but the radicalization of religions has the opposite effect. The distribution of health and well-being shows troubling signs of inequity and reversal. Because people continue to congregate in places of high environmental risk, especially in the crowded periphery, hundreds of millions find themselves in continuing jeopardy (as the 2004 tsunami, in the absence of coordinated warning systems, tragically confirmed). Inevitably, places of costly historic and current conflict take their toll as the "international community" stands by without effective intervention, another form of jeopardy that afflicts the destinies of millions. And males and females in the same locales have widely varying experiences, their destinies diverging in sometimes agonizing ways. Even in the world's cities, where the "rising tide lifts all boats" promise of globalization should be especially evident, power creates a high-relief topography of privilege and privation. Nor is the world's divisive political stockade likely to be flattened anytime soon. Even as states try to join in unions and associations, their provinces and regions nurture nationalisms working the other way. The power of place still holds the vast majority of us in its thrall.`,
+      `Of course, the question is not whether the world is flat. Thomas Friedman, who coined the phrase, concedes that he realizes "that the world is not flat. Don't worry, I know . . . I have engaged in literary license in titling [my] book to draw attention . . . ." It is the process of "flattening" on which Friedman wants to focus through his provocative title, "the single most important trend in the world today," that is at issue. And in certain respects the global playing field is leveling, but in other ways the reverse appears to be true. Notions of a flat world raise expectations of growing access and increasing opportunity that are mantras of globalization but are all too often at variance with reality. Powerful forces, natural as well as human, slow the flattening process in a contest that will determine the future of the planet.`
+    ]
+  },
+  {
+    id: 2,
+    title: 'Passage 3 — Draft: Mayflies',
+    source: 'Questions 25–32',
+    type: 'sentence',
+    sentences: [
+      `Many people living near the Mississippi River see mayflies as a nuisance.`,
+      `The mayflies' sudden entrance to life in the air, their languid flying and resting on objects at their convenience, and their deaths seemed a bother to humans.`,
+      `Adult mayflies' short lifespans are at the heart of the problem.`,
+      `Throughout a couple of weeks each summer, the nymphs (juvenile mayflies), which have developed underwater for the past few months, hatch into millions of mature mayflies with nonfunctioning mouths.`,
+      `These adult mayflies mate, lay eggs on and near the water, and then die within a day or two, sometimes in piles multiple feet high that create treacherous driving conditions for humans.`,
+      `These perishing insects impact nondriving humans as well by collecting on air conditioner compressors and the like, often preventing them from functioning.`,
+      `In fact, often street lights are shut off in order to decrease the number of mayflies congregating near them.`,
+      `And, believe it or not, the wings and skin of mayflies cause an allergic reaction on the skin of some folk.`,
+      `The bodies of these mayflies are long and thin and support large wings.`,
+      `Despite these nuisances, I have come to value these somewhat unsightly creatures.`,
+      `For example, because they need clean water to survive, their presence indicates to humans the health of a body of fresh water.`,
+      `In fact, they have been used to assess the quality of water in fresh water areas.`,
+      `In addition, the nymphs, with their functioning mouths, contribute to the cleanliness of the water by eating algae and decaying vegetation.`,
+      `Therefore, they are important indicators of the health of a human's environment.`,
+      `Moreover, clean bodies of fresh water attract human recreational activity.`,
+      `Mayflies impact the economies of humans who live near healthy rivers and lakes—both tourists and locals spend money to enjoy activities in and near the water.`
+    ]
+  },
+  {
+    id: 3,
+    title: 'Passage 4 — Draft: Teen Employment',
+    source: 'Questions 33–40',
+    type: 'sentence',
+    sentences: [
+      `To work or not to work, that is the question.`,
+      `Or, at least it's a question many teens consider during their summer break.`,
+      `According to the U.S. Bureau of Labor Statistics (USBLS), the state with the highest employment rate for teens is Mississippi at 77 percent, and the lowest is North Dakota at 51 percent.`,
+      `Why are teens not working as much?`,
+      `That depends.`,
+      `Middle- and upper-class teens are choosing not to work, while lower-income teens have less access to jobs.`,
+      `Teens with access to part-time jobs often select what they perceive as better alternatives (e.g., community service, volunteer work, unpaid internships, and academics) that have nonfinancial benefits.`,
+      `In fact, the USBLS reports the number of teens in summer school rose from 10 percent to 45 percent from 1985 to 2018.`,
+      `Teenagers in my neighborhood, meanwhile, must need some extra money because I see numerous signs at the local grocery store advertising personal lawn-mowing and babysitting services.`,
+      `Some lament the decrease in teen employment.`,
+      `According to the Center for Work Ethic Development, part-time jobs teach the soft skills that future employers value: "Although it might seem unrelated, scooping ice cream or working retail can make you a better doctor, accountant, teacher or benefit any other career path you might choose."`,
+      `These soft skills include social and emotional intelligence, work ethic, responsibility, and a positive attitude.`,
+      `Depending on what teens do instead, these traits can be developed in other ways.`,
+      `To work or not to work isn't the most important question.`,
+      `The focus should be on what teenagers do to develop soft skills—the people skills, the work ethic, the communication skills—that will help them regardless of the path they will take in life.`,
+      `Thus, it is very important for teenagers to get back into the workforce so they can develop the work ethic they need to be successful.`
+    ]
+  },
+  {
+    id: 4,
+    title: 'Passage 5 — Draft: Smart Cities',
+    source: 'Questions 41–45',
+    type: 'sentence',
+    sentences: [
+      `From Toronto, Canada, to Songdo, South Korea, cities around the world are promoting themselves as "smart cities."`,
+      `Smart-city initiatives cover a remarkable range of public infrastructure, including waste receptacles that signal when they need to be emptied, systems that broadcast locations of available communal bicycles, and electricity grids that distribute energy in response to usage patterns.`,
+      `Many people are excited about these new technologies, and, as civil engineering professor and infrastructure expert Shoshanna Saxe explains, they are intended to improve infrastructure by collecting data and responding automatically.`,
+      `As Saxe and other urbanists have argued, however, that premise should be questioned.`,
+      `Adding sensors for data collection to public services such as water and electricity distribution introduces new vulnerability to urban infrastructure.`,
+      `Saxe and other experienced city planners worry that networked digital infrastructure would be more akin to a smartphone or computer.`,
+      `Although smart infrastructure promises more efficient delivery of services and may deliver on that promise in the beginning, it is susceptible to failure in ways that conventional infrastructure is not.`
+    ]
+  }
+];
+
+const QUESTIONS = [
+  // Passage 1 (Q1-12)
+  {n:1, p:0, highlight:{type:'par',pars:[]},
+   text:`Which of the following best describes the author's purpose in the passage?`,
+   choices:['To encourage the audience to derive confidence from their talents','To reveal the disheartening realities of pursuing a career in literature','To convince aspiring writers of the importance of hard work','To challenge a misconception about the value of studying grammar']},
+  {n:2, p:0, highlight:{type:'par',pars:[]},
+   text:`Which of the following statements best represents the thesis of the passage?`,
+   choices:['Effective writing relies on grammar and vocabulary, not fancy technology.','The most compelling stories come from observation, not inspiration.','True writers understand that writing is a form of play, not work.','The key to success as a writer is consistent effort, not inherent ability.']},
+  {n:3, p:0, highlight:{type:'par',pars:[0]},
+   text:`In the first paragraph, the author supports her claim that writers should "go to writers' workshops" (sentence 1) by`,
+   choices:['noting that workshops provide opportunities to write for diverse media, including television','explaining how workshops can help writers learn unpleasant but valuable lessons','highlighting the value of workshops for writers at different stages in their careers','dispelling the misperception that workshops may stifle writers\' creativity']},
+  {n:4, p:0, highlight:{type:'par',pars:[0]},
+   text:`In the first paragraph, the author uses the phrase "rented readers" (sentence 6) in order to`,
+   choices:['define writers\' workshops in terms of their value to aspiring writers','express sympathy for writers who have no one to read their work for free','contrast the academic goals of classes with the commercial aims of workshops','highlight the financial sacrifices that writers must make in order to succeed']},
+  {n:5, p:0, highlight:{type:'par',pars:[1]},
+   text:`In the fifth sentence of the second paragraph ("Perhaps . . . lunch hour"), the author strategically arranges clauses in a way that`,
+   choices:['signals a gap between the sentence\'s literal meaning and the author\'s intended meaning','establishes a hierarchy from the most to least effective times of day to practice writing','suggests a distinction between reasonable and unreasonable sacrifices for the sake of art','underlines the variety of opportunities for those who are dedicated to improving their craft']},
+  {n:6, p:0, highlight:{type:'par',pars:[1]},
+   text:`In the last sentence of the second paragraph ("Journal writing . . . projects"), the author connects two independent clauses with the conjunction "and" primarily to`,
+   choices:['establish a connection between keeping a journal and writing every day','indicate that journaling is just as important as careful revision for aspiring writers','explain why keeping a journal usually helps writers come up with new story ideas','emphasize that keeping a journal has multiple benefits for writers']},
+  {n:7, p:0, highlight:{type:'par',pars:[3]},
+   text:`Based on her discussion of the publication process (paragraph 4, sentences 1–11), the author most likely believes which of the following about her audience?`,
+   choices:['They aim to support themselves fully by selling their writing.','They have limited familiarity with publication.','They probably overestimate the value of inspiration.','They already have some experience with rejection.']},
+  {n:8, p:0, highlight:{type:'par',pars:[3,4]},
+   text:`The author's shift in tone between the fourth and fifth paragraphs marks a transition between`,
+   choices:['offering practical advice and advocating broader principles','exemplifying simplicity and demonstrating complexity','identifying problems and proposing solutions','presenting absolute claims and qualifying those claims']},
+  {n:9, p:0, highlight:{type:'par',pars:[5,6]},
+   text:`The author's decision to repeat the word "forget" in the sixth and seventh paragraphs primarily serves to`,
+   choices:['underscore the author\'s disapproval of those who rely on talent or inspiration','indicate the order in which the author believes writers should develop their craft','suggest a parallel between two distinct ideas that the author treats with similar skepticism','convey the author\'s ambivalence about the value of talent and inspiration']},
+  {n:10, p:0, highlight:{type:'par',pars:[6]},
+   text:`The seventh paragraph as a whole implicitly challenges which of the following ideas?`,
+   choices:['Talent is a valuable asset for aspiring writers.','Successful writers must be very talented.','People should take pride in their talents.','Talent is meaningless without persistence.']},
+  {n:11, p:0, highlight:{type:'par',pars:[6]},
+   text:`In the seventh sentence of the seventh paragraph, the author uses a dash primarily to`,
+   choices:['separate a secondary idea from the main thrust of the sentence','distinguish her own claim from a claim she aims to refute','contrast her definition of a term with the term\'s common usage','elaborate on a general claim by providing specific examples']},
+  {n:12, p:0, highlight:{type:'par',pars:[6]},
+   text:`The author's contrast between "persistence" and "stubbornness" (paragraph 7, sentences 7–8) advances her argument in which of the following ways?`,
+   choices:['It helps explain why habit is more valuable than inspiration.','It challenges the stereotype that talented writers are often stubborn.','It concedes that persistence can have negative consequences.','It underscores the need for writers to continually improve their craft.']},
+
+  // Passage 2 (Q13-24)
+  {n:13, p:1, highlight:{type:'par',pars:[]},
+   text:`Which of the following best describes the author's exigence in the passage?`,
+   choices:['The need for greater resources to solve problems caused by globalization','The proliferation of global organizations that he finds menacing','The opportunity for facilitating communication between disparate groups','The uncritical acceptance of an opinion that he believes deserves scrutiny']},
+  {n:14, p:1, highlight:{type:'par',pars:[]},
+   text:`In the passage, the author makes which of the following assumptions about his audience?`,
+   choices:['They are familiar with mainstream rhetoric about globalization.','They are concerned about the loss of cultural diversity.','They support taking collective action to address global inequity.','They benefit from the process of global flattening.']},
+  {n:15, p:1, highlight:{type:'par',pars:[0]},
+   text:`In the second sentence of the passage ("Ancient . . . history"), the series of short, simple clauses and the word play on "history" convey the author's sense that the claims of flat-world proponents`,
+   choices:['sound a little too superficial to be true','are supported by multiple sources of historical evidence','sound exaggerated only to those who are opposed to globalization','seem more modest than the claims made by their predecessors']},
+  {n:16, p:1, highlight:{type:'par',pars:[1,2]},
+   text:`Which of the following best describes the relationship between the second paragraph and the third paragraph?`,
+   choices:['Paragraph 3 presents evidence that addresses questions raised in paragraph 2.','Paragraph 3 challenges the validity of data presented in paragraph 2.','Paragraph 3 presents arguments that support a thesis stated in paragraph 2.','Paragraph 3 draws conclusions from evidence presented in paragraph 2.']},
+  {n:17, p:1, highlight:{type:'par',pars:[2]},
+   text:`In the sixth sentence of the third paragraph ("The near-global diffusion . . . opposite effect"), the author mentions the diffusion of English primarily to`,
+   choices:['challenge an assumption that other arguments have left unexamined','emphasize how one phenomenon can have contradictory effects','justify his use of one language rather than multiple languages','acknowledge the validity of one element of an argument he generally opposes']},
+  {n:18, p:1, highlight:{type:'par',pars:[2]},
+   text:`Which of the following does the author represent as an effect of "congregat[ing] in places of high environmental risk" (paragraph 3, sentence 8)?`,
+   choices:['Opportunities that disproportionately benefit the wealthy','Frequent conflict among groups with different cultural values','Dangers that disproportionately affect certain populations','Overcrowding that exacerbates public health crises']},
+  {n:19, p:1, highlight:{type:'par',pars:[2]},
+   text:`In the eighth sentence of the third paragraph, the author mentions "the absence of coordinated warning systems" to amplify his point about the`,
+   choices:['prohibitive costs of global intervention programs','depopulation of locations at high environmental risk','opposition expressed toward regional nationalism','hazards of inhabiting certain geographical areas']},
+  {n:20, p:1, highlight:{type:'par',pars:[2]},
+   text:`The quotation marks around the phrase "international community" (paragraph 3, sentence 9) serve primarily to`,
+   choices:['indicate that the author is quoting an established political source','signal a skeptical tone that reflects the author\'s doubts about such a community','emphasize the need for global cooperation when disasters occur','protect the author from allegations that he is taking credit for others\' language']},
+  {n:21, p:1, highlight:{type:'par',pars:[2]},
+   text:`In the final sentence of the third paragraph ("The power of place . . . thrall"), which of the following best describes the effect of removing the words "the vast majority of"?`,
+   choices:['The author\'s claim would become logically inconsistent.','The author\'s claim would lose its popular appeal.','The author\'s claim would be narrowed by its exclusion of some people.','The author\'s claim would be broadened by the exclusion of a qualifier.']},
+  {n:22, p:1, highlight:{type:'par',pars:[]},
+   text:`At what point in his development of the passage's line of reasoning does the author arrive at his thesis?`,
+   choices:['The first two sentences of the first paragraph','The first three sentences of the second paragraph','The first four sentences of the third paragraph','The first four sentences of the fourth paragraph']},
+  {n:23, p:1, highlight:{type:'par',pars:[3]},
+   text:`In the fifth sentence of the fourth paragraph ("And in certain . . . true"), the author italicizes the verb "is" primarily to emphasize`,
+   choices:['an area of agreement between himself and flat-world proponents','an area of disagreement between himself and Thomas Friedman','the equivalence he sees between two seemingly opposite claims','the equivalence he sees between two seemingly unrelated phenomena']},
+  {n:24, p:1, highlight:{type:'par',pars:[3]},
+   text:`In the fourth paragraph, the author cites Thomas Friedman primarily to`,
+   choices:['attribute the flawed assumptions of flat-world proponents to a single source','acknowledge that the arguments of flat-world proponents have some validity','note a difference between the original version of an argument and popular adaptations of it','reveal his insights into the circumstances that led Friedman to invent the flat-world metaphor']},
+
+  // Passage 3 (Q25-32) — sentence highlights
+  {n:25, p:2, highlight:{type:'sent',sents:[0]},
+   text:`Which of the following sentences, if added after sentence 1, would effectively engage the audience to want to know what prompted the writer's change of heart regarding mayflies?`,
+   choices:['Nuisances can be either permanent or temporary.','And all bugs seem to be nuisances to humans.','I was one of those people.','I have lived on this river for three years.']},
+  {n:26, p:2, highlight:{type:'sent',sents:[3]},
+   text:`The writer is considering deleting the underlined portion of sentence 4 — the phrase "(juvenile mayflies), which have developed underwater for the past few months." Should the writer keep or delete the underlined text?`,
+   choices:['Keep it, because it explains a term that may be unfamiliar to some readers.','Keep it, because it assists in developing the central thesis of the passage.','Delete it, because it does not enhance the discussion of adult mayflies.','Delete it, because it reflects the writer\'s bias against adult mayflies.']},
+  {n:27, p:2, highlight:{type:'sent',sents:[5]},
+   text:`After sentence 6, the writer wants to provide additional evidence to support the claim that mayflies are a nuisance to humans. Which of the following sentences would best achieve this purpose?`,
+   choices:['However, it is sad to think about all of these insects dying so quickly.','Also, it is important to remember that air-conditioning is a modern convenience.','Furthermore, mayflies regularly disrupt activities held on or near the river, requiring people to constantly swat at their bodies to rid themselves of the expiring insects.','As is common knowledge, street lights are necessary for safety.']},
+  {n:28, p:2, highlight:{type:'sent',sents:[6]},
+   text:`In sentence 7, the writer is considering adding the parenthetical phrase "(another hazard to humans in cars)" after the word "off." Should the writer make this addition?`,
+   choices:['Yes, because it emphasizes the importance of the street lights to drivers.','Yes, because it connects the evidence offered in the sentence to the paragraph\'s main claim.','No, because it interrupts the fluidity of the sentence without adding relevant information.','No, because it introduces an opposing argument.']},
+  {n:29, p:2, highlight:{type:'sent',sents:[5,6,7,8]},
+   text:`Which of the following sentences should be deleted from the second paragraph because it does not provide evidence that supports the main claim of the paragraph?`,
+   choices:['Sentence 6','Sentence 7','Sentence 8','Sentence 9']},
+  {n:30, p:2, highlight:{type:'sent',sents:[9]},
+   text:`The writer wants sentence 10 to convey the reluctant appreciation of mayflies she describes in the third paragraph. Which version of the underlined portion of sentence 10 most effectively accomplishes this goal — "I have come to value these somewhat unsightly creatures"?`,
+   choices:['(as it is now)','I can now respect these foul creatures','I find myself entranced by these graceful beings','I remain perplexed by these strange and horrid creatures']},
+  {n:31, p:2, highlight:{type:'sent',sents:[14,15]},
+   text:`Which of the following words should be placed at the beginning of sentence 16 in order to demonstrate a connection to the previous sentence?`,
+   choices:['However,','Regardless,','Thus,','Conversely,']},
+  {n:32, p:2, highlight:{type:'sent',sents:[15]},
+   text:`Which of the following sentences, if added after sentence 16, would provide the best concluding sentence for the passage?`,
+   choices:['Robust economies are important to humans, both locally and globally.','Since there are both good and bad consequences of mayflies, humans must weigh them carefully.','Clearly there are both negative and positive aspects to coexisting with mayflies, but, when considering their role in the environment and economy, there is reason to appreciate them.','It is easy to see, then, that tourists might have a greater appreciation for mayflies than locals do.']},
+
+  // Passage 4 (Q33-40)
+  {n:33, p:3, highlight:{type:'sent',sents:[2]},
+   text:`In sentence 3, the writer wants to provide statistical information that helps contextualize the argument of the passage for the audience. Which of the following versions of the underlined portion of sentence 3 most effectively accomplishes this goal?`,
+   choices:['(as it is now)','the number of teens working summer jobs has declined significantly since the 1970s','22 percent of high school females were employed in 2018, compared with 25 percent of males','the employment rate for teens with some college education is higher than for teens without']},
+  {n:34, p:3, highlight:{type:'sent',sents:[4]},
+   text:`The writer is considering adding the following sentence after sentence 5: "Many people view teenagers as lazy, preferring to spend their summers playing video games and hanging out with friends instead of working hard to make money." Should the writer add this sentence after sentence 5?`,
+   choices:['Yes, because the stereotype of the lazy teenager is central to the argument.','Yes, because it allows the writer to demonstrate an understanding of teen culture.','No, because it is illogical to include video games in a passage about teen employment.','No, because it portrays teenagers in a way that may alienate a teenage audience.']},
+  {n:35, p:3, highlight:{type:'sent',sents:[5]},
+   text:`The writer wants to add information to the beginning of sentence 6 to help establish the credibility of the source of the information in the sentence. Which of the following choices most effectively accomplishes this goal?`,
+   choices:['According to Professor Paul Harrington,','According to Paul Harrington, a Drexel University professor of labor markets,','According to a Drexel University professor,','According to a university professor who is an expert in economics,']},
+  {n:36, p:3, highlight:{type:'sent',sents:[6]},
+   text:`The writer is considering deleting the underlined portion of sentence 7 — the list "(e.g., community service, volunteer work, unpaid internships, and academics)." Should the writer keep or delete the underlined text?`,
+   choices:['Keep it, because it exemplifies what these "better alternatives" might be.','Keep it, because it is necessary to understand the nonfinancial benefits mentioned.','Delete it, because it distracts from the message of the paragraph.','Delete it, because it repeats information that was already provided earlier in the passage.']},
+  {n:37, p:3, highlight:{type:'sent',sents:[8]},
+   text:`The writer is considering deleting sentence 9 from the passage. Should the writer keep or delete this sentence?`,
+   choices:['Keep it, because the evidence it provides is likely to be familiar to most readers.','Keep it, because it provides anecdotal evidence that helps develop the main argument.','Delete it, because the writer\'s choice of diction is too informal for this type of passage.','Delete it, because the anecdote about local teenagers is irrelevant to the paragraph\'s main argument.']},
+  {n:38, p:3, highlight:{type:'sent',sents:[10,11]},
+   text:`The writer wants to add a sentence after sentence 12 to qualify the claim made by the Center for Work Ethic Development that part-time jobs result in teens developing beneficial soft skills. Which of the following sentences best accomplishes this goal?`,
+   choices:['However, while it is true that part-time jobs can provide opportunities to develop soft skills, not all part-time jobs guarantee that teens will actually develop these attributes.','Yet part-time jobs often provide more than soft skills, as they can also teach young people financial responsibility.','Even as part-time jobs are being filled more often by retirees, teens are being passed over for positions.','On the other hand, hard skills are the most important things that teens should develop during their formative years.']},
+  {n:39, p:3, highlight:{type:'sent',sents:[12]},
+   text:`The writer wants to add an adjective before the word "traits" in sentence 13 in order to improve the clarity of the claim. Which adjective would best modify "traits" to reinforce the passage's perspective on soft skills?`,
+   choices:['generous','interesting','routine','desirable']},
+  {n:40, p:3, highlight:{type:'sent',sents:[15]},
+   text:`The writer is considering deleting sentence 16 from the passage. Should the writer keep or delete sentence 16?`,
+   choices:['Keep it, because the discussion of work ethic is one of the most important parts of the argument.','Keep it, because teens would benefit by the writer\'s specific advice.','Delete it, because its conclusion does not follow logically from the evidence presented in the passage.','Delete it, because it provides direct advice to teenagers, which is inappropriate for this passage.']},
+
+  // Passage 5 (Q41-45)
+  {n:41, p:4, highlight:{type:'sent',sents:[0]},
+   text:`The writer wants to add language to the end of sentence 1 to help clarify the central concept of the essay. Which of the following choices would best accomplish this goal?`,
+   choices:['meaning that these cities attract the smartest and most innovative companies','cities prepared to move into global markets and international economies','communities that use the latest digital technology and computer networks to improve city services','even though "smart" has little to do with their overall intellectual reputation']},
+  {n:42, p:4, highlight:{type:'sent',sents:[2]},
+   text:`The writer wants to avoid revealing any potential bias in sentence 3. Which of the following versions of the underlined portion of sentence 3 would best accomplish this goal? (The current text: "civil engineering professor and infrastructure expert Shoshanna Saxe explains")`,
+   choices:['(as it is now)','excessively dismissive civil engineering professor Shoshanna Saxe argues','civil engineering professor Shoshanna Saxe scornfully notes','civil engineering professor Shoshanna Saxe cleverly declares']},
+  {n:43, p:4, highlight:{type:'sent',sents:[4]},
+   text:`The writer wants to add a sentence after sentence 5 to elaborate on that sentence's description of the contrast between infrastructure with and without sensors for data collection. Which of the following sentences would best accomplish this goal?`,
+   choices:['These vulnerabilities may soon be addressed by advances in cybersecurity technology.','\"Smart\" water-detection systems are quite costly to install and maintain.','Water pipes, roads, and other elements of conventional infrastructure are built to last decades, whereas smart infrastructure requires constant software updates and maintenance.','Sensors using "smart" technologies can now detect minute amounts of water contamination.']},
+  {n:44, p:4, highlight:{type:'sent',sents:[5]},
+   text:`The writer is considering adding the clause "devices that work optimally only for a few years before bugs in their programming introduce glitches and errors" to the end of sentence 6. Should the writer add this clause to the end of sentence 6?`,
+   choices:['Yes, because it demonstrates that Saxe and other city planners are familiar with recent technological developments.','Yes, because the additional information clarifies the nature of the comparison being made in the sentence.','No, because it makes Saxe seem like a biased source.','No, because the word "bugs" is ambiguous and might confuse readers.']},
+  {n:45, p:4, highlight:{type:'sent',sents:[4,5,6]},
+   text:`The writer wants to add evidence to exemplify the main argument of the second paragraph. Which of the following pieces of evidence would best accomplish this goal?`,
+   choices:['A narrative about a city in which smart city infrastructure broke down quickly after installation','A quotation from a city council member describing the costs associated with smart city programs','The results of a survey showing that many residents are concerned about privacy issues with smart city technology','Statistics comparing the growth rates of cities that have adopted smart infrastructure with those that have not']}
+];
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+
+let studentName = '';
+let studentId = '';
+let answers = {};       // {qnum: 'A'|'B'|'C'|'D'}
+let currentQ = 1;
+let currentPassage = 0;
+let tabSwitches = [];
+let activityLog = [];
+let timerInterval = null;
+let timeLeft = 3600;
+let cameraStream = null;
+let snapshotInterval = null;
+let snapshotCount = 0;
+let examStartTime = null;
+
+// ═══════════════════════════════════════════════════════════
+// ENTRY
+// ═══════════════════════════════════════════════════════════
+
+function startEntry() {
+  studentName = document.getElementById('student-name').value.trim();
+  studentId = document.getElementById('student-id').value.trim();
+  if (!studentName) { alert('Please enter your name.'); return; }
+
+  document.getElementById('entry-screen').style.display = 'none';
+  document.getElementById('camera-screen').style.display = 'flex';
+
+  // Try camera
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then(stream => {
+      cameraStream = stream;
+      document.getElementById('preview-video').srcObject = stream;
+    })
+    .catch(() => {
+      document.getElementById('camera-screen').querySelector('p').textContent =
+        'Camera not available or permission denied. You may proceed without it.';
+    });
+}
+
+function startExam() {
+  document.getElementById('camera-screen').style.display = 'none';
+  if (cameraStream) {
+    document.getElementById('webcam-corner').style.display = 'block';
+    document.getElementById('webcam-video').srcObject = cameraStream;
+    startSnapshots();
+  }
+  launchExam();
+}
+
+function skipCamera() {
+  document.getElementById('camera-screen').style.display = 'none';
+  launchExam();
+}
+
+// ═══════════════════════════════════════════════════════════
+// EXAM LAUNCH
+// ═══════════════════════════════════════════════════════════
+
+function launchExam() {
+  examStartTime = new Date();
+  document.getElementById('exam-screen').style.display = 'flex';
+  document.getElementById('tb-student').textContent = studentName;
+
+  // Restore progress from localStorage if same student+date
+  try {
+    const saved = localStorage.getItem('aplang_mcq_progress');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed.studentName === studentName && parsed.examDate === new Date().toLocaleDateString()) {
+        answers = parsed.answers || {};
+        logActivity('Progress restored — ' + Object.keys(answers).length + ' answers recovered');
+      }
+    }
+  } catch(e) {}
+
+  buildNavDots();
+  showPassage(0);
+  goToQ(1);
+  startTimer();
+  setupTabMonitor();
+  logActivity('Exam started');
+
+  // Sync to Sheet every 90 seconds
+  setInterval(() => syncToSheet('In Progress'), 90000);
+}
+
+// ── Build payload for Sheet ────────────────────────────────
+function buildPayload(status) {
+  return {
+    studentName,
+    studentId,
+    examName: 'AP Lang PE2',
+    examDate: new Date().toLocaleDateString(),
+    answers,
+    timeUsed: formatTime(3600 - timeLeft),
+    tabSwitches,
+    activityLog,
+    cameraUsed: !!cameraStream,
+    snapshotCount,
+    status
+  };
+}
+
+// ── Progressive save: localStorage + Sheet ─────────────────
+function syncToSheet(status) {
+  // Always save to localStorage first — instant, no network needed
+  try {
+    localStorage.setItem('aplang_mcq_progress', JSON.stringify({
+      studentName,
+      examDate: new Date().toLocaleDateString(),
+      answers
+    }));
+  } catch(e) {}
+
+  // Then try the Sheet
+  if (!WEB_APP_URL || WEB_APP_URL === 'PASTE_YOUR_WEB_APP_URL_HERE') return;
+
+  fetch(WEB_APP_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(buildPayload(status))
+  }).catch(() => {
+    logActivity('Sheet sync failed (offline?) — data saved locally');
+  });
+}
+
+function buildNavDots() {
+  const bar = document.getElementById('q-nav-bar');
+  bar.innerHTML = '';
+  let lastP = null;
+  QUESTIONS.forEach(q => {
+    if (lastP !== null && q.p !== lastP) {
+      const sep = document.createElement('div');
+      sep.className = 'q-sep';
+      bar.appendChild(sep);
+    }
+    const dot = document.createElement('div');
+    dot.className = 'q-dot';
+    dot.id = `dot-${q.n}`;
+    dot.textContent = q.n;
+    dot.onclick = () => goToQ(q.n);
+    bar.appendChild(dot);
+    lastP = q.p;
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// PASSAGE RENDERING
+// ═══════════════════════════════════════════════════════════
+
+function showPassage(idx) {
+  currentPassage = idx;
+  document.querySelectorAll('.ptab').forEach(t => {
+    t.classList.toggle('active', parseInt(t.dataset.p) === idx);
+  });
+  const p = PASSAGES[idx];
+  const container = document.getElementById('passage-content');
+  let html = `<div class="passage-source">${p.source}</div>
+              <div class="passage-title">${p.title}</div>`;
+
+  if (p.type === 'paragraph') {
+    p.pars.forEach((text, i) => {
+      html += `<div class="par-block" id="par-${idx}-${i}">
+        <span class="par-num">${i+1}</span>
+        ${text}
+      </div>`;
+    });
+  } else {
+    // sentence-based
+    html += `<div id="sent-container-${idx}">`;
+    p.sentences.forEach((text, i) => {
+      html += `<span class="sent-span" id="sent-${idx}-${i}">(${i+1}) ${text} </span>`;
+    });
+    html += `</div>`;
+  }
+
+  container.innerHTML = html;
+  applyHighlights();
+}
+
+function applyHighlights(qNum) {
+  const q = QUESTIONS.find(q => q.n === (qNum || currentQ));
+  if (!q) return;
+
+  const p = PASSAGES[q.p];
+
+  // Clear all highlights first
+  document.querySelectorAll('.par-block').forEach(el => el.classList.remove('highlighted'));
+  document.querySelectorAll('.sent-span').forEach(el => el.classList.remove('highlighted'));
+
+  if (!q.highlight) return;
+
+  if (p.type === 'paragraph' && q.highlight.type === 'par') {
+    q.highlight.pars.forEach(pi => {
+      const el = document.getElementById(`par-${q.p}-${pi}`);
+      if (el) {
+        el.classList.add('highlighted');
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    });
+  } else if (p.type === 'sentence' && q.highlight.type === 'sent') {
+    q.highlight.sents.forEach(si => {
+      const el = document.getElementById(`sent-${q.p}-${si}`);
+      if (el) {
+        el.classList.add('highlighted');
+        if (si === q.highlight.sents[0]) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }
+    });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// QUESTION RENDERING
+// ═══════════════════════════════════════════════════════════
+
+function goToQ(n) {
+  currentQ = n;
+  const q = QUESTIONS.find(q => q.n === n);
+  if (!q) return;
+
+  // Switch passage if needed
+  if (q.p !== currentPassage) {
+    showPassage(q.p);
+  } else {
+    applyHighlights(n);
+  }
+
+  // Highlight passage tab for current passage group
+  document.querySelectorAll('.ptab').forEach(t => {
+    t.classList.toggle('current-passage', parseInt(t.dataset.p) === q.p);
+  });
+
+  // Update dots
+  document.querySelectorAll('.q-dot').forEach(d => {
+    const num = parseInt(d.textContent);
+    d.classList.toggle('current', num === n);
+    d.classList.toggle('answered', answers[num] !== undefined);
+  });
+
+  // Render question
+  const letters = ['A','B','C','D'];
+  let html = `<div class="q-header">Question ${n} of 45 &nbsp;·&nbsp; ${PASSAGES[q.p].title.split('—')[0].trim()}</div>
+    <div class="q-text">${n}. ${q.text}</div>
+    <div class="choices">`;
+
+  q.choices.forEach((ch, i) => {
+    const selected = answers[n] === letters[i] ? 'selected' : '';
+    html += `<div class="choice ${selected}" onclick="selectAnswer(${n},'${letters[i]}')">
+      <span class="choice-letter">${letters[i]}.</span>
+      <span class="choice-text">${ch}</span>
+    </div>`;
+  });
+  html += `</div>`;
+
+  document.getElementById('q-content').innerHTML = html;
+  document.getElementById('q-content').scrollTop = 0;
+
+  // Nav buttons
+  document.getElementById('btn-prev').disabled = n === 1;
+  document.getElementById('btn-next').disabled = n === 45;
+}
+
+function selectAnswer(n, letter) {
+  answers[n] = letter;
+  goToQ(n);
+  logActivity(`Q${n}: selected ${letter}`);
+  // Save to localStorage on every answer
+  try {
+    localStorage.setItem('aplang_mcq_progress', JSON.stringify({
+      studentName,
+      examDate: new Date().toLocaleDateString(),
+      answers
+    }));
+  } catch(e) {}
+}
+
+function prevQ() { if (currentQ > 1) goToQ(currentQ - 1); }
+function nextQ() { if (currentQ < 45) goToQ(currentQ + 1); }
+
+// ═══════════════════════════════════════════════════════════
+// TIMER
+// ═══════════════════════════════════════════════════════════
+
+function startTimer() {
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    const m = Math.floor(timeLeft / 60);
+    const s = timeLeft % 60;
+    const display = `${m}:${s.toString().padStart(2,'0')}`;
+    const el = document.getElementById('timer');
+    el.textContent = display;
+    el.className = '';
+    if (timeLeft <= 300) el.classList.add('warn');
+    if (timeLeft <= 60) el.classList.add('urgent');
+    if (timeLeft <= 0) { clearInterval(timerInterval); submitExam(); }
+  }, 1000);
+}
+
+// ═══════════════════════════════════════════════════════════
+// TAB MONITORING
+// ═══════════════════════════════════════════════════════════
+
+function setupTabMonitor() {
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      const record = { time: new Date().toISOString(), when: formatTime(3600 - timeLeft) };
+      tabSwitches.push(record);
+      document.getElementById('tb-switches').textContent = tabSwitches.length;
+      const bar = document.getElementById('flag-bar');
+      bar.style.display = 'flex';
+      logActivity(`Tab switch #${tabSwitches.length} at ${record.when}`);
+    } else {
+      // Hide bar after 4 seconds
+      setTimeout(() => {
+        document.getElementById('flag-bar').style.display = 'none';
+      }, 4000);
+    }
+  });
+}
+
+function logActivity(msg) {
+  activityLog.push({ t: new Date().toISOString(), msg });
+}
+
+function formatTime(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${s.toString().padStart(2,'0')}`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// WEBCAM SNAPSHOTS
+// ═══════════════════════════════════════════════════════════
+
+function startSnapshots() {
+  snapshotInterval = setInterval(takeSnapshot, 60000); // every 60s
+}
+
+function takeSnapshot() {
+  if (!cameraStream) return;
+  const video = document.getElementById('webcam-video');
+  const canvas = document.createElement('canvas');
+  canvas.width = 140; canvas.height = 100;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, 140, 100);
+  snapshotCount++;
+  logActivity(`Webcam snapshot #${snapshotCount} taken`);
+}
+
+// ═══════════════════════════════════════════════════════════
+// SUBMIT
+// ═══════════════════════════════════════════════════════════
+
+function confirmSubmit() {
+  const answered = Object.keys(answers).length;
+  const unanswered = 45 - answered;
+  let msg = `Submit exam?\n\nAnswered: ${answered}/45`;
+  if (unanswered > 0) msg += `\nUnanswered: ${unanswered} questions`;
+  if (confirm(msg)) submitExam();
+}
+
+function submitExam() {
+  clearInterval(timerInterval);
+  clearInterval(snapshotInterval);
+  if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
+  logActivity('Exam submitted');
+
+  // Final sync to Sheet as Submitted
+  syncToSheet('Submitted');
+
+  // Clear localStorage now that it's submitted
+  try { localStorage.removeItem('aplang_mcq_progress'); } catch(e) {}
+
+  document.getElementById('exam-screen').style.display = 'none';
+  document.getElementById('results-screen').style.display = 'flex';
+
+  buildResults();
+}
+
+// ═══════════════════════════════════════════════════════════
+// RESULTS
+// ═══════════════════════════════════════════════════════════
+
+function buildResults() {
+  let correct = 0, incorrect = 0, blank = 0;
+  const timeUsed = 3600 - timeLeft;
+
+  QUESTIONS.forEach(q => {
+    const given = answers[q.n];
+    const key = ANSWER_KEY[q.n];
+    if (!given) blank++;
+    else if (given === key) correct++;
+    else incorrect++;
+  });
+
+  document.getElementById('res-student-name').textContent =
+    `${studentName}  ·  ${studentId}  ·  ${new Date().toLocaleDateString()}`;
+  document.getElementById('score-num').textContent = correct;
+
+  // Grid
+  const pct = Math.round((correct / 45) * 100);
+  document.getElementById('results-grid').innerHTML = `
+    <div class="result-card">
+      <div class="rc-val" style="color:var(--green)">${correct}</div>
+      <div class="rc-label">Correct</div>
+    </div>
+    <div class="result-card">
+      <div class="rc-val" style="color:var(--accent)">${incorrect}</div>
+      <div class="rc-label">Incorrect</div>
+    </div>
+    <div class="result-card">
+      <div class="rc-val">${blank}</div>
+      <div class="rc-label">Blank</div>
+    </div>
+    <div class="result-card">
+      <div class="rc-val">${pct}%</div>
+      <div class="rc-label">Score</div>
+    </div>
+    <div class="result-card">
+      <div class="rc-val">${formatTime(timeUsed)}</div>
+      <div class="rc-label">Time Used</div>
+    </div>
+    <div class="result-card">
+      <div class="rc-val">${tabSwitches.length}</div>
+      <div class="rc-label">Tab Switches</div>
+    </div>
+  `;
+
+  // Integrity log
+  let ilog = '';
+  if (tabSwitches.length === 0) {
+    ilog += `<div class="flag-item"><div class="flag-dot ok"></div><div>No tab switches detected.</div></div>`;
+  } else {
+    tabSwitches.forEach((ts, i) => {
+      ilog += `<div class="flag-item"><div class="flag-dot"></div><div>Tab switch #${i+1} at ${ts.when} into the exam (${ts.time})</div></div>`;
+    });
+  }
+  ilog += `<div class="flag-item"><div class="flag-dot ok"></div><div>Camera ${cameraStream ? 'active' : 'not used'} · ${snapshotCount} snapshot(s) captured</div></div>`;
+  ilog += `<div class="flag-item"><div class="flag-dot ok"></div><div>Activity log: ${activityLog.length} events recorded</div></div>`;
+  document.getElementById('integrity-log').innerHTML = ilog;
+
+  // Q review table
+  const passageNames = ['Passage 1','Passage 2','Passage 3','Passage 4','Passage 5'];
+  let rows = '';
+  QUESTIONS.forEach(q => {
+    const given = answers[q.n] || '—';
+    const key = ANSWER_KEY[q.n];
+    const correct2 = given === key;
+    const blank2 = given === '—';
+    rows += `<tr>
+      <td>${q.n}</td>
+      <td>${passageNames[q.p]}</td>
+      <td class="${blank2 ? '' : (correct2 ? 'correct' : 'incorrect')}">${given}</td>
+      <td>${key}</td>
+      <td class="${blank2 ? '' : (correct2 ? 'correct' : 'incorrect')}">${blank2 ? 'Blank' : (correct2 ? '✓' : '✗')}</td>
+    </tr>`;
+  });
+  document.getElementById('review-tbody').innerHTML = rows;
+}
+
+// ═══════════════════════════════════════════════════════════
+// CSV EXPORT
+// ═══════════════════════════════════════════════════════════
+
+function downloadCSV() {
+  const passageNames = ['Passage 1','Passage 2','Passage 3','Passage 4','Passage 5'];
+  const timeUsed = 3600 - timeLeft;
+  let csv = `AP English Language Practice Exam #2 — Results\n`;
+  csv += `Student,${studentName}\n`;
+  csv += `ID,${studentId}\n`;
+  csv += `Date,${new Date().toLocaleDateString()}\n`;
+  csv += `Time Used,${formatTime(timeUsed)}\n`;
+  csv += `Tab Switches,${tabSwitches.length}\n`;
+  csv += `Camera,${cameraStream ? 'Yes' : 'No'}\n\n`;
+
+  csv += `Q#,Passage,Student Answer,Correct Answer,Result\n`;
+  QUESTIONS.forEach(q => {
+    const given = answers[q.n] || '';
+    const key = ANSWER_KEY[q.n];
+    const result = !given ? 'Blank' : (given === key ? 'Correct' : 'Incorrect');
+    csv += `${q.n},${passageNames[q.p]},${given},${key},${result}\n`;
+  });
+
+  csv += `\nTab Switch Log\n`;
+  if (tabSwitches.length === 0) csv += `None\n`;
+  tabSwitches.forEach((ts, i) => {
+    csv += `Switch #${i+1},${ts.when} into exam,${ts.time}\n`;
+  });
+
+  csv += `\nActivity Log\n`;
+  activityLog.forEach(e => { csv += `${e.t},${e.msg}\n`; });
+
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `AP_Lang_MCQ_${studentName.replace(/\s+/g,'_')}_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+</script>
+</body>
+</html>
