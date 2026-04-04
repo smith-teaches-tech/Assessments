@@ -1143,6 +1143,7 @@ let currentPassage = 0;
 let tabSwitches = [];
 let activityLog = [];
 let timerInterval = null;
+let syncInterval = null;
 let timeLeft = 3600;
 let cameraStream = null;
 let snapshotInterval = null;
@@ -1214,7 +1215,7 @@ function launchExam() {
   logActivity('Exam started');
 
   // Sync to Sheet every 90 seconds
-  setInterval(() => syncToSheet('In Progress'), 90000);
+  syncInterval = setInterval(() => syncToSheet('In Progress'), 90000);
 }
 
 // ── Build payload for Sheet ────────────────────────────────
@@ -1522,6 +1523,7 @@ function confirmSubmit() {
 function submitExam() {
   clearInterval(timerInterval);
   clearInterval(snapshotInterval);
+  clearInterval(syncInterval);
   if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
   logActivity('Exam submitted');
 
