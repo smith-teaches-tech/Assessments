@@ -32,8 +32,8 @@
     background: var(--cream);
     color: var(--dark);
     min-height: 100vh;
-    font-size: 17px;
-    line-height: 1.6;
+    font-size: 13px;
+    line-height: 1.5;
   }
 
   /* ─── ENTRY SCREEN ─── */
@@ -308,7 +308,7 @@
   #passage-content {
     flex: 1;
     overflow-y: auto;
-    padding: 28px 32px;
+    padding: 18px 22px;
     position: relative;
   }
 
@@ -322,7 +322,7 @@
   }
 
   .passage-title {
-    font-size: 1.1rem;
+    font-size: 0.92rem;
     font-weight: 600;
     margin-bottom: 20px;
     padding-bottom: 12px;
@@ -331,7 +331,7 @@
 
   /* Paragraph-based passages */
   .par-block {
-    margin-bottom: 16px;
+    margin-bottom: 10px;
     position: relative;
     padding-left: 36px;
     transition: background 0.2s;
@@ -376,46 +376,64 @@
   #q-nav-bar {
     display: flex;
     align-items: center;
-    padding: 10px 16px;
+    padding: 7px 12px;
     border-bottom: 1px solid var(--border);
     background: white;
-    gap: 8px;
+    gap: 5px;
     flex-shrink: 0;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    overflow-x: auto;
   }
 
   .q-dot {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: 'DM Mono', monospace;
-    font-size: 10px;
+    font-size: 9px;
     cursor: pointer;
     border: 1.5px solid var(--border);
     color: var(--muted);
     transition: all 0.15s;
     flex-shrink: 0;
+    position: relative;
   }
 
   .q-dot:hover { border-color: var(--dark); color: var(--dark); }
-  .q-dot.answered { background: var(--dark); color: white; border-color: var(--dark); }
+  .q-dot.answered { background: var(--green); color: white; border-color: var(--green); }
   .q-dot.current { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 0 2px var(--accent-light); }
-  .q-dot.answered.current { background: var(--accent); border-color: var(--accent); color: white; }
+  .q-dot.answered.current { background: var(--green); border-color: var(--accent); color: white; box-shadow: 0 0 0 2px var(--accent-light); }
+  .q-dot.flagged { border-color: var(--warn); color: var(--warn); }
+  .q-dot.flagged::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--warn);
+  }
+  .q-dot.answered.flagged { background: var(--green); border-color: var(--warn); }
 
-  .q-sep {
-    width: 1px;
-    height: 20px;
-    background: var(--border);
+  .nav-passage-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+    margin-right: 2px;
     flex-shrink: 0;
   }
 
   #q-content {
     flex: 1;
     overflow-y: auto;
-    padding: 24px 28px;
+    padding: 14px 18px;
   }
 
   .q-header {
@@ -428,9 +446,9 @@
   }
 
   .q-text {
-    font-size: 1.05rem;
-    line-height: 1.65;
-    margin-bottom: 22px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    margin-bottom: 12px;
     color: var(--dark);
   }
 
@@ -441,15 +459,15 @@
   .choices {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin-bottom: 28px;
+    gap: 6px;
+    margin-bottom: 14px;
   }
 
   .choice {
     display: flex;
     align-items: flex-start;
     gap: 12px;
-    padding: 12px 16px;
+    padding: 9px 12px;
     border: 1.5px solid var(--border);
     border-radius: 4px;
     cursor: pointer;
@@ -475,8 +493,8 @@
   }
 
   .choice-text {
-    font-size: 0.97rem;
-    line-height: 1.5;
+    font-size: 0.84rem;
+    line-height: 1.42;
     color: var(--dark);
   }
 
@@ -487,7 +505,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 28px;
+    padding: 9px 18px;
     border-top: 1px solid var(--border);
     background: white;
     flex-shrink: 0;
@@ -527,17 +545,21 @@
   /* Webcam corner */
   #webcam-corner {
     position: fixed;
-    bottom: 70px;
-    right: 20px;
-    width: 140px;
-    height: 100px;
-    border-radius: 6px;
+    bottom: 16px;
+    right: 16px;
+    width: 80px;
+    height: 56px;
+    border-radius: 4px;
     overflow: hidden;
-    border: 2px solid rgba(255,255,255,0.3);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    border: 1.5px solid rgba(255,255,255,0.2);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
     z-index: 100;
     background: #111;
+    opacity: 0.75;
+    transition: opacity 0.2s;
   }
+
+  #webcam-corner:hover { opacity: 1; }
 
   #webcam-corner video {
     width: 100%;
@@ -548,12 +570,12 @@
 
   #webcam-label {
     position: absolute;
-    bottom: 4px;
-    left: 4px;
+    bottom: 2px;
+    left: 3px;
     font-family: 'DM Mono', monospace;
-    font-size: 8px;
-    color: rgba(255,255,255,0.6);
-    letter-spacing: 0.1em;
+    font-size: 7px;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.08em;
   }
 
   /* ─── RESULTS SCREEN ─── */
@@ -697,7 +719,7 @@
   .q-review-table .incorrect { color: var(--accent); font-weight: 700; }
 
   .btn-download {
-    padding: 12px 28px;
+    padding: 9px 18px;
     background: var(--dark);
     color: white;
     border: none;
@@ -752,7 +774,6 @@
   <video id="preview-video" autoplay muted playsinline></video>
   <div>
     <button class="camera-btn" onclick="startExam()">Camera Ready — Start Exam →</button>
-    <button class="camera-btn secondary" onclick="skipCamera()">Skip Camera (Proceed Without)</button>
   </div>
 </div>
 
@@ -784,12 +805,16 @@
 
     <!-- Passage panel -->
     <div id="passage-panel">
-      <div id="passage-tabs">
-        <div class="ptab active" data-p="0" onclick="showPassage(0)">Passage 1</div>
-        <div class="ptab" data-p="1" onclick="showPassage(1)">Passage 2</div>
-        <div class="ptab" data-p="2" onclick="showPassage(2)">Passage 3</div>
-        <div class="ptab" data-p="3" onclick="showPassage(3)">Passage 4</div>
-        <div class="ptab" data-p="4" onclick="showPassage(4)">Passage 5</div>
+      <div id="passage-tabs" style="display:flex;align-items:center;padding:6px 12px;border-bottom:1px solid var(--border);background:#f0ebe0;gap:10px;flex-shrink:0;">
+        <label style="font-family:'Instrument Sans',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap;">Passage</label>
+        <select id="passage-select" onchange="showPassage(parseInt(this.value))"
+          style="flex:1;padding:5px 8px;border:1px solid var(--border);border-radius:3px;font-family:'Instrument Sans',sans-serif;font-size:12px;background:white;color:var(--dark);cursor:pointer;outline:none;">
+          <option value="0">1 — Octavia Butler (Q1–12)</option>
+          <option value="1">2 — Flat World / Geography (Q13–24)</option>
+          <option value="2">3 — Mayflies Draft (Q25–32)</option>
+          <option value="3">4 — Teen Employment Draft (Q33–40)</option>
+          <option value="4">5 — Smart Cities Draft (Q41–45)</option>
+        </select>
       </div>
       <div id="passage-content"></div>
     </div>
@@ -1158,10 +1183,7 @@ function startExam() {
   launchExam();
 }
 
-function skipCamera() {
-  document.getElementById('camera-screen').style.display = 'none';
-  launchExam();
-}
+
 
 // ═══════════════════════════════════════════════════════════
 // EXAM LAUNCH
@@ -1236,24 +1258,56 @@ function syncToSheet(status) {
   });
 }
 
+// flagged questions set
+const flagged = new Set();
+
 function buildNavDots() {
+  renderNavDots();
+}
+
+function renderNavDots() {
   const bar = document.getElementById('q-nav-bar');
   bar.innerHTML = '';
-  let lastP = null;
-  QUESTIONS.forEach(q => {
-    if (lastP !== null && q.p !== lastP) {
-      const sep = document.createElement('div');
-      sep.className = 'q-sep';
-      bar.appendChild(sep);
-    }
+
+  // Label
+  const label = document.createElement('div');
+  label.className = 'nav-passage-label';
+  const passageNums = ['1','2','3','4','5'];
+  label.textContent = `P${passageNums[currentPassage]}:`;
+  bar.appendChild(label);
+
+  // Only questions for current passage
+  const passageQs = QUESTIONS.filter(q => q.p === currentPassage);
+  passageQs.forEach(q => {
     const dot = document.createElement('div');
-    dot.className = 'q-dot';
+    let cls = 'q-dot';
+    if (answers[q.n]) cls += ' answered';
+    if (q.n === currentQ) cls += ' current';
+    if (flagged.has(q.n)) cls += ' flagged';
+    dot.className = cls;
     dot.id = `dot-${q.n}`;
     dot.textContent = q.n;
+    dot.title = flagged.has(q.n) ? 'Marked for review' : '';
     dot.onclick = () => goToQ(q.n);
     bar.appendChild(dot);
-    lastP = q.p;
   });
+
+  // Flag button for current question
+  const flagBtn = document.createElement('button');
+  flagBtn.id = 'flag-btn';
+  flagBtn.onclick = toggleFlag;
+  flagBtn.style.cssText = `margin-left:8px;padding:3px 10px;border:1.5px solid ${flagged.has(currentQ) ? 'var(--warn)' : 'var(--border)'};border-radius:3px;background:${flagged.has(currentQ) ? 'var(--warn-light)' : 'white'};font-family:'Instrument Sans',sans-serif;font-size:10px;font-weight:600;color:${flagged.has(currentQ) ? 'var(--warn)' : 'var(--muted)'};cursor:pointer;white-space:nowrap;flex-shrink:0;`;
+  flagBtn.textContent = flagged.has(currentQ) ? '⚑ Marked' : '⚐ Mark';
+  bar.appendChild(flagBtn);
+}
+
+function toggleFlag() {
+  if (flagged.has(currentQ)) {
+    flagged.delete(currentQ);
+  } else {
+    flagged.add(currentQ);
+  }
+  renderNavDots();
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1262,9 +1316,8 @@ function buildNavDots() {
 
 function showPassage(idx) {
   currentPassage = idx;
-  document.querySelectorAll('.ptab').forEach(t => {
-    t.classList.toggle('active', parseInt(t.dataset.p) === idx);
-  });
+  const sel = document.getElementById('passage-select');
+  if (sel) sel.value = idx;
   const p = PASSAGES[idx];
   const container = document.getElementById('passage-content');
   let html = `<div class="passage-source">${p.source}</div>
@@ -1339,17 +1392,10 @@ function goToQ(n) {
     applyHighlights(n);
   }
 
-  // Highlight passage tab for current passage group
-  document.querySelectorAll('.ptab').forEach(t => {
-    t.classList.toggle('current-passage', parseInt(t.dataset.p) === q.p);
-  });
 
-  // Update dots
-  document.querySelectorAll('.q-dot').forEach(d => {
-    const num = parseInt(d.textContent);
-    d.classList.toggle('current', num === n);
-    d.classList.toggle('answered', answers[num] !== undefined);
-  });
+
+  // Re-render nav dots for current passage
+  renderNavDots();
 
   // Render question
   const letters = ['A','B','C','D'];
@@ -1542,6 +1588,9 @@ function buildResults() {
 
   // Integrity log
   let ilog = '';
+  if (flagged.size > 0) {
+    ilog += `<div class="flag-item"><div class="flag-dot" style="background:var(--warn)"></div><div>Questions marked for review: ${[...flagged].sort((a,b)=>a-b).join(', ')}</div></div>`;
+  }
   if (tabSwitches.length === 0) {
     ilog += `<div class="flag-item"><div class="flag-dot ok"></div><div>No tab switches detected.</div></div>`;
   } else {
